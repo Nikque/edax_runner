@@ -1,5 +1,8 @@
 # Unreleased
 
+- edax is [Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX) instead of Edax 4.4. (libedax has the same functions as the original one)
+- libedax is built for several levels of CPU (any x86-64, AVX2, AVX-512), and edax_runner uses the fastest one which the CPU can run. (Windows, Linux)
+- the settings are in `config.ini` of Edax 4.5.5 (nikque) instead of `edax.ini`. (`edax.ini` is still read, but `config.ini` is prioritized)
 - fix: a blank line in `learning_list.txt` stopped edax_runner. Now it's ignored.
 - fix: a line which can't be learned (unknown format, illegal move) was removed as if it had been learned. Now it's skipped with a warning, and recorded in `learned_log.txt` as a comment.
   - edax ignores an illegal move and the following ones, so a game was learned from an unintended position.
@@ -8,7 +11,7 @@
 - fix: if `learning_list.txt` was edited while learning, another line was removed instead of the learned one.
 - fix: the book wasn't saved right after `fix`.
 - fix: `exit` wasn't removed from `learning_list.txt`, so edax_runner couldn't be restarted without editing it.
-- fix: `book.dat` and `learning_list.txt` could be broken if edax_runner was killed while saving them. Now they are replaced after saving to another file.
+- fix: `book.dat` and `learning_list.txt` could be broken if edax_runner was killed while saving them. Now they are replaced after saving to another file. (`book.dat`: by edax)
 - accept `[0 0]F5F6`, `[ 0 0 ] F5F6`, `2, F5F6`.
 - use the directory of the executable if `learning_list.txt` isn't in the current directory.
 - handle `learning_list.txt` faster with less memory, by handling it as bytes and reading it once per line to learn.

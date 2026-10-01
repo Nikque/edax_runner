@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -8,6 +9,8 @@ const String _dataDir = 'data';
 const String _bookFile = '$_dataDir/book.dat';
 const String _learningListFile = 'learning_list.txt';
 const String _learnedLogFile = 'learned_log.txt';
+const String _configFile = 'config.ini';
+const String _oldConfigFile = 'edax.ini';
 const String _savingExt = '.saving';
 const String _moves = '((?:[a-hA-H][1-8])+)';
 final _edaxVsEdaxRegexp = RegExp('^$_moves\$'); // e.g. "f5f6f7"
@@ -30,17 +33,21 @@ void main(final List<String> arguments) {
   }
   // NOTE: edax can't save the book without this directory.
   Directory(_dataDir).createSync(recursive: true);
-  // remove the files left by the previous run which was killed while saving.
-  _deleteIfExists('$_bookFile$_savingExt');
-  _deleteIfExists('$_learningListFile$_savingExt');
+  _deleteFilesLeftByKilledRun();
+  if (File(_oldConfigFile).existsSync() && File(_configFile).existsSync()) {
+    _print(
+      'WARNING: "$_oldConfigFile" is read, but "$_configFile" is prioritized.'
+      ' Move your settings to "$_configFile".',
+    );
+  }
 
   var learningList = _readLearningList();
-  final edax = LibEdax(_edaxSharedLibraryPath)
+  final edax = LibEdax(_edaxSharedLibraryPath())
     ..libedaxInitialize([
       '',
       '-book-file',
       _bookFile,
-    ]) // NOTE: these are prioritized over `edax.ini`.
+    ]) // NOTE: these are prioritized over `config.ini`.
     ..edaxInit()
     ..edaxMode(3) // NOTE: edax must not move unless edax_runner tells.
     ..edaxEnableBookVerbose()
@@ -69,11 +76,52 @@ void main(final List<String> arguments) {
   _print('edax has terminated.');
 }
 
-String get _edaxSharedLibraryPath {
-  if (Platform.isLinux) return 'libedax.so';
-  if (Platform.isMacOS) return 'libedax.universal.dylib';
-  if (Platform.isWindows) return 'libedax-x64.dll';
-  throw Exception('${Platform.operatingSystem} is not supported');
+/// libedax is built for several levels of CPU.
+/// Return the fastest one which the CPU can run.
+String _edaxSharedLibraryPath() {
+  final List<String> names; // [any CPU, x86-64-v3 (AVX2), x86-64-v4 (AVX-512)]
+  if (Platform.isLinux) {
+    names = ['libedax.so', 'libedax-v3.so', 'libedax-v4.so'];
+  } else if (Platform.isMacOS) {
+    names = ['libedax.universal.dylib'];
+  } else if (Platform.isWindows) {
+    names = ['libedax-x64.dll', 'libedax-x64-v3.dll', 'libedax-x64-v4.dll'];
+  } else {
+    throw Exception('${Platform.operatingSystem} is not supported');
+  }
+
+  var name = names.first;
+  if (names.length > 1 && File(name).existsSync()) {
+    final cpuLevel = _cpuLevel(_libraryPath(name));
+    if (cpuLevel >= 4 && File(names[2]).existsSync()) {
+      name = names[2];
+    } else if (cpuLevel >= 3 && File(names[1]).existsSync()) {
+      name = names[1];
+    }
+  }
+  _print('use "$name".');
+  return _libraryPath(name);
+}
+
+/// NOTE: a library in the current directory isn't found by its name on some OS.
+String _libraryPath(final String name) => File(name).existsSync()
+    ? '${Directory.current.path}${Platform.pathSeparator}$name'
+    : name;
+
+/// Ask the level of the CPU to libedax which any CPU can run.
+///
+/// 4: x86-64-v4 (AVX-512), 3: x86-64-v3 (AVX2), otherwise: lower or unknown.
+int _cpuLevel(final String libraryPath) {
+  try {
+    final library = DynamicLibrary.open(libraryPath);
+    final level = library.lookupFunction<Int32 Function(), int Function()>(
+      'libedax_cpu_level',
+    )();
+    library.close();
+    return level;
+  } on ArgumentError {
+    return 0; // NOTE: the original libedax doesn't have this function.
+  }
 }
 
 /// edax_runner uses the files in the current directory.
@@ -169,9 +217,19 @@ T _retry<T>(final T Function() action) {
   }
 }
 
-void _deleteIfExists(final String path) {
-  final file = File(path);
-  if (file.existsSync()) _retry(file.deleteSync);
+/// edax_runner and edax replace a file after saving to another file.
+/// Remove the files left by the previous run which was killed while saving.
+void _deleteFilesLeftByKilledRun() {
+  final leftByEdax = RegExp(r'^book\.dat(\.\w+)?\.tmp\.\d+$');
+  final files = [
+    File('$_learningListFile$_savingExt'),
+    ...Directory(_dataDir).listSync().whereType<File>().where(
+      (final file) => leftByEdax.hasMatch(file.uri.pathSegments.last),
+    ),
+  ];
+  for (final file in files) {
+    if (file.existsSync()) _retry(file.deleteSync);
+  }
 }
 
 void _print(final String msg) => stdout.writeln('\n[edax_runner] $msg\n');
@@ -191,10 +249,9 @@ bool _play(final LibEdax edax, final String moves) {
 
 void _saveBook(final LibEdax edax) {
   _print('book save...');
-  // NOTE: don't overwrite the book directly,
+  // NOTE: edax replaces the book after saving to another file,
   // so that it isn't broken even if edax_runner is killed while saving.
-  edax.edaxBookSave('$_bookFile$_savingExt');
-  _retry(() => File('$_bookFile$_savingExt').renameSync(_bookFile));
+  edax.edaxBookSave(_bookFile);
   _print('has finished book save.');
 }
 
