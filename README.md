@@ -21,7 +21,7 @@ tiny tool for [edax-reversi](https://github.com/sensuikan1973/edax-reversi) **au
 3. edit `edax.ini` which you like.
 4. [optional] add your `book.dat` to `data/book.dat`.
 5. run edax_runner.
-6. you can check what runner has already learned by checking `learning_log.txt`.
+6. you can check what runner has already learned by checking `learned_log.txt`.
 
 <details><summary>Mac</summary>
 
@@ -49,7 +49,7 @@ start ./edax_runner.exe
 
 ### How to write learning_list.txt ?
 
-There are **only 3 rules**. Example is [here](https://github.com/sensuikan1973/edax_runner/blob/main/resources/learning_list.txt).
+There are **only 5 rules**. Example is [here](https://github.com/sensuikan1973/edax_runner/blob/main/resources/learning_list.txt).
 
 | purpose                        | format                                 | example                |
 | :----------------------------- | :------------------------------------- | :--------------------- |
@@ -57,10 +57,15 @@ There are **only 3 rules**. Example is [here](https://github.com/sensuikan1973/e
 | `book deviate` command         | `[relativeError absoluteError] {move}` | `[1 1] F5F6F7F8`       |
 | comment                        | `// {your comment}`                    | `// I like Brightwell` |
 | `book fix` command             | `fix`                                  | `fix`                  |
+| stop edax_runner               | `exit`                                 | `exit`                 |
 
 - NOTE
   - The default value of `book-randomness` is `0`. So, you can also write `F5F6F7` which is equal to `0,F5F6F7`.
   - What's `book deviate` ?: See [edax document](https://sensuikan1973.github.io/edax-reversi/book_8c.html#ae9ee489a468274fd83808c53da0418c9), [Choirokoitia document](https://choi.lavox.net/edax/start)
+  - Blank lines are ignored.
+  - A line which can't be learned (unknown format, illegal move) is skipped. It's recorded in `learned_log.txt` as a comment like `// [edax_runner] skipped (illegal move): F5F5`.
+  - You can edit `learning_list.txt` while edax_runner is running. edax_runner reads it again whenever it has finished learning a line. For example, you can stop edax_runner after the current line by adding `exit` to the head.
+  - The comments can be written in any encoding except UTF-16.
 
 ## References
 

@@ -31,8 +31,19 @@ jobs:
       - name: analyzer
         run: dart analyze --fatal-infos --fatal-warnings .
 
+  dart_test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dart-lang/setup-dart@v1.8.1
+      - name: install dependencies
+        run: dart pub get
+      - name: test
+        run: dart test
+
   run_sample:
-    needs: [dart_format, dart_analyze]
+    needs: [dart_format, dart_analyze, dart_test]
     timeout-minutes: 15
     runs-on: ${{ matrix.runner_machine }}
     strategy:

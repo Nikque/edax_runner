@@ -1,3 +1,18 @@
+# Unreleased
+
+- fix: a blank line in `learning_list.txt` stopped edax_runner. Now it's ignored.
+- fix: a line which can't be learned (unknown format, illegal move) was removed as if it had been learned. Now it's skipped with a warning, and recorded in `learned_log.txt` as a comment.
+  - edax ignores an illegal move and the following ones, so a game was learned from an unintended position.
+- fix: edax_runner crashed if `learning_list.txt` had a comment which isn't UTF-8 (e.g. Shift_JIS).
+- fix: the line terminators (CRLF) of `learning_list.txt` were replaced by LF.
+- fix: if `learning_list.txt` was edited while learning, another line was removed instead of the learned one.
+- fix: the book wasn't saved right after `fix`.
+- fix: `exit` wasn't removed from `learning_list.txt`, so edax_runner couldn't be restarted without editing it.
+- fix: `book.dat` and `learning_list.txt` could be broken if edax_runner was killed while saving them. Now they are replaced after saving to another file.
+- accept `[0 0]F5F6`, `[ 0 0 ] F5F6`, `2, F5F6`.
+- use the directory of the executable if `learning_list.txt` isn't in the current directory.
+- handle `learning_list.txt` faster with less memory, by handling it as bytes and reading it once per line to learn.
+
 # 5.3.0
 
 upgrade dependencies.
