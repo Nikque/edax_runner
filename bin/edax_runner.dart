@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:edax_runner/learning_list.dart';
+import 'package:ffi/ffi.dart';
 import 'package:libedax4dart/libedax4dart.dart';
 
 const String _dataDir = 'data';
@@ -42,7 +43,8 @@ void main(final List<String> arguments) {
   }
 
   var learningList = _readLearningList();
-  final edax = LibEdax(_edaxSharedLibraryPath())
+  final libraryPath = _edaxSharedLibraryPath();
+  final edax = LibEdax(libraryPath)
     ..libedaxInitialize([
       '',
       '-book-file',
@@ -53,7 +55,29 @@ void main(final List<String> arguments) {
     ..edaxEnableBookVerbose()
     ..edaxPlayPrint();
 
+  // NOTE: with `book-store-tasks` of `config.ini`, libedax learns several games at the same time.
+  final gamesLearner = _GamesLearner(libraryPath);
+  if (gamesLearner.tasks > 1) {
+    _print('learn up to ${gamesLearner.tasks} games at the same time.');
+  }
+
   while (true) {
+    final games = gamesLearner.tasks > 1
+        ? findEntries(
+            learningList,
+            max: gamesLearner.tasks,
+            accept: (final text) => _gameLine(text) != null,
+          )
+        : const <LearningEntry>[];
+    if (games.length > 1) {
+      learningList = _learnGames(
+        edax,
+        gamesLearner,
+        games.map((final game) => game.text).toList(),
+      );
+      continue;
+    }
+
     final text = findEntry(learningList)?.text ?? '';
     if (text.isEmpty) break;
     if (text.toLowerCase() == 'exit') {
@@ -124,6 +148,91 @@ int _cpuLevel(final String libraryPath) {
   }
 }
 
+/// The functions of libedax (Edax 4.5.5 nikque) which libedax4dart doesn't have.
+class _GamesLearner {
+  _GamesLearner(final String libraryPath) {
+    try {
+      final library = DynamicLibrary.open(libraryPath);
+      _storeTasks = library.lookupFunction<Int32 Function(), int Function()>(
+        'edax_book_store_tasks',
+      );
+      _storeGames = library
+          .lookupFunction<
+            Int32 Function(Pointer<Utf8>, Pointer<Utf8>),
+            int Function(Pointer<Utf8>, Pointer<Utf8>)
+          >('edax_book_store_games');
+    } on ArgumentError {
+      // NOTE: the original libedax doesn't have these functions.
+      _storeTasks = null;
+      _storeGames = null;
+    }
+  }
+
+  int Function()? _storeTasks;
+  int Function(Pointer<Utf8>, Pointer<Utf8>)? _storeGames;
+
+  /// The number of games to learn at the same time. (`book-store-tasks`)
+  int get tasks => _storeGames == null ? 1 : (_storeTasks?.call() ?? 1);
+
+  /// Play and learn the games of [lines] (`{book-randomness},{moves}` for each),
+  /// and return whether each game has been learned.
+  List<bool> learn(final List<String> lines) {
+    final games = lines.join('\n').toNativeUtf8();
+    final status = calloc<Uint8>(lines.length + 1);
+    try {
+      _storeGames!(games, status.cast());
+      return [for (var i = 0; i < lines.length; i++) status[i] == 0x31];
+    } finally {
+      calloc
+        ..free(games)
+        ..free(status);
+    }
+  }
+}
+
+/// Return `{book-randomness},{moves}` if [text] is a game of edax vs edax.
+String? _gameLine(final String text) {
+  var match = _edaxVsEdaxRegexp.firstMatch(text);
+  if (match != null) return '0,${match.group(1)!}';
+
+  match = _edaxVsEdaxWithRandomnessRegexp.firstMatch(text);
+  if (match == null) return null;
+  final randomness = int.tryParse(match.group(1)!);
+  if (randomness == null || randomness > 0x7FFFFFFF) return null;
+  return '$randomness,${match.group(2)!}';
+}
+
+/// Learn the games of [texts] at the same time, and return the new content of learning list.
+Uint8List _learnGames(
+  final LibEdax edax,
+  final _GamesLearner gamesLearner,
+  final List<String> texts,
+) {
+  _print('start to learn ${texts.length} games.');
+  texts.forEach(stdout.writeln);
+  stdout.writeln();
+  final learned = gamesLearner.learn(
+    texts.map((final text) => _gameLine(text)!).toList(),
+  );
+  stdout.writeln();
+  final skipReasons = [
+    for (final isLearned in learned) isLearned ? null : 'illegal move',
+  ];
+  _print(
+    'has finished edax vs edax and book store of '
+    '${learned.where((final isLearned) => isLearned).length} games.',
+  );
+  for (var i = 0; i < texts.length; i++) {
+    if (skipReasons[i] != null) {
+      _print('WARNING: has skipped "${texts[i]}". (${skipReasons[i]})');
+    }
+  }
+  _saveBook(edax);
+  final rest = _removeLearnedTexts(texts, skipReasons);
+  _print('has removed ${texts.length} games.');
+  return rest;
+}
+
 /// edax_runner uses the files in the current directory.
 /// If they aren't there (e.g. launched from another directory), use the directory of the executable.
 void _useExecutableDirectoryIfNeeded() {
@@ -183,8 +292,15 @@ Uint8List _readLearningList() {
 }
 
 /// Move [text] from learning list to learned log, and return the new content of learning list.
-Uint8List _removeLearnedText(final String text, {final String? skipReason}) {
-  final taken = takeEntry(_readLearningList(), text, skipReason: skipReason);
+Uint8List _removeLearnedText(final String text, {final String? skipReason}) =>
+    _removeLearnedTexts([text], [skipReason]);
+
+/// Move [texts] from learning list to learned log, and return the new content of learning list.
+Uint8List _removeLearnedTexts(
+  final List<String> texts,
+  final List<String?> skipReasons,
+) {
+  final taken = takeEntries(_readLearningList(), texts, skipReasons);
   _retry(
     () => File(
       _learnedLogFile,

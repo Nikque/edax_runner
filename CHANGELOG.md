@@ -3,6 +3,9 @@
 - edax is [Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX) instead of Edax 4.4. (libedax has the same functions as the original one)
 - libedax is built for several levels of CPU (any x86-64, AVX2, AVX-512), and edax_runner uses the fastest one which the CPU can run. (Windows, Linux)
 - the settings are in `config.ini` of Edax 4.5.5 (nikque) instead of `edax.ini`. (`edax.ini` is still read, but `config.ini` is prioritized)
+- learn several games at the same time with `book-store-tasks` of `config.ini`. (`1` by default: a game after the other, as before)
+  - the next lines of edax vs edax (up to `book-store-tasks`) are played at the same time, then their positions are searched at the same time and stored. (`edax_book_store_games` of libedax, called with `dart:ffi`)
+  - `learning_list.txt` and `learned_log.txt` are updated once for these lines.
 - fix: a blank line in `learning_list.txt` stopped edax_runner. Now it's ignored.
 - fix: a line which can't be learned (unknown format, illegal move) was removed as if it had been learned. Now it's skipped with a warning, and recorded in `learned_log.txt` as a comment.
   - edax ignores an illegal move and the following ones, so a game was learned from an unintended position.

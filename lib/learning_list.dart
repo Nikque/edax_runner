@@ -58,8 +58,15 @@ int _bomLength(final Uint8List bytes) =>
 ///
 /// Comment lines and blank lines are passed over. <br>
 /// If [text] is specified, find the first one which equals to [text].
-LearningEntry? findEntry(final Uint8List bytes, {final String? text}) {
-  var start = _bomLength(bytes);
+LearningEntry? findEntry(final Uint8List bytes, {final String? text}) =>
+    _findEntryFrom(bytes, _bomLength(bytes), text: text);
+
+LearningEntry? _findEntryFrom(
+  final Uint8List bytes,
+  final int from, {
+  final String? text,
+}) {
+  var start = from;
   while (start < bytes.length) {
     final lf = bytes.indexOf(_lf, start);
     final end = lf < 0 ? bytes.length : lf + 1;
@@ -72,6 +79,25 @@ LearningEntry? findEntry(final Uint8List bytes, {final String? text}) {
     start = end;
   }
   return null;
+}
+
+/// Find the first texts to learn in [bytes], as long as [accept] returns true, up to [max] texts.
+///
+/// Comment lines and blank lines are passed over.
+List<LearningEntry> findEntries(
+  final Uint8List bytes, {
+  required final int max,
+  required final bool Function(String text) accept,
+}) {
+  final entries = <LearningEntry>[];
+  var start = _bomLength(bytes);
+  while (entries.length < max) {
+    final entry = _findEntryFrom(bytes, start);
+    if (entry == null || !accept(entry.text)) break;
+    entries.add(entry);
+    start = entry.end;
+  }
+  return entries;
 }
 
 /// Take [text] out of [bytes], which is the content of learning list.
@@ -110,6 +136,24 @@ TakenEntry takeEntry(
     ..add(Uint8List.sublistView(bytes, 0, start))
     ..add(Uint8List.sublistView(bytes, entry.end));
   return TakenEntry(log.takeBytes(), rest.takeBytes());
+}
+
+/// Take [texts] out of [bytes] one after the other, as [takeEntry] does.
+///
+/// [skipReasons] has the reason for each text which hasn't been learned (null if learned).
+TakenEntry takeEntries(
+  final Uint8List bytes,
+  final List<String> texts,
+  final List<String?> skipReasons,
+) {
+  final log = BytesBuilder(copy: false);
+  var rest = bytes;
+  for (var i = 0; i < texts.length; i++) {
+    final taken = takeEntry(rest, texts[i], skipReason: skipReasons[i]);
+    log.add(taken.log);
+    rest = taken.rest;
+  }
+  return TakenEntry(log.takeBytes(), rest);
 }
 
 String _logText(final String text, final String? skipReason) =>

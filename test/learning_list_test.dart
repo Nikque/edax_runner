@@ -135,6 +135,70 @@ void main() {
     });
   });
 
+  group('findEntries', () {
+    bool isGame(final String text) => RegExp(r'^[a-h1-8]+$').hasMatch(text);
+
+    test('finds the first texts while they are accepted', () {
+      final bytes = _bytes('// a\nf5d6\n\nf5f6\n// b\nf5f4\nfix\nf5d6c3\n');
+      final entries = findEntries(bytes, max: 8, accept: isGame);
+      expect(entries.map((final entry) => entry.text), [
+        'f5d6',
+        'f5f6',
+        'f5f4',
+      ]);
+      expect(_text(bytes.sublist(entries[1].start, entries[1].end)), 'f5f6\n');
+    });
+
+    test('finds up to max texts', () {
+      final entries = findEntries(
+        _bytes('f5d6\nf5f6\nf5f4\n'),
+        max: 2,
+        accept: isGame,
+      );
+      expect(entries.map((final entry) => entry.text), ['f5d6', 'f5f6']);
+    });
+
+    test('finds nothing if the first text is not accepted', () {
+      expect(
+        findEntries(_bytes('fix\nf5d6\n'), max: 8, accept: isGame),
+        isEmpty,
+      );
+      expect(findEntries(_bytes('// a\n'), max: 8, accept: isGame), isEmpty);
+    });
+  });
+
+  group('takeEntries', () {
+    test('takes the texts with the lines above them', () {
+      final taken = takeEntries(
+        _bytes('// a\nf5d6\n\n// b\nf5f5\nf5f6\nfix\n'),
+        ['f5d6', 'f5f5', 'f5f6'],
+        [null, 'illegal move', null],
+      );
+      expect(
+        _text(taken.log),
+        '// a\nf5d6\n\n// b\n// [edax_runner] skipped (illegal move): f5f5\nf5f6\n',
+      );
+      expect(_text(taken.rest), 'fix\n');
+    });
+
+    test('is the same as takeEntry for a text', () {
+      final bytes = _bytes('// a\r\nf5d6\r\nfix\r\n');
+      final taken = takeEntries(bytes, ['f5d6'], [null]);
+      expect(taken.log, takeEntry(bytes, 'f5d6').log);
+      expect(taken.rest, takeEntry(bytes, 'f5d6').rest);
+    });
+
+    test('takes the same texts one by one', () {
+      final taken = takeEntries(
+        _bytes('f5d6\nf5d6\nf5d6\n'),
+        ['f5d6', 'f5d6'],
+        [null, null],
+      );
+      expect(_text(taken.log), 'f5d6\nf5d6\n');
+      expect(_text(taken.rest), 'f5d6\n');
+    });
+  });
+
   test('isUtf16', () {
     expect(isUtf16(Uint8List.fromList([0xFF, 0xFE, 0x66, 0x00])), isTrue);
     expect(isUtf16(Uint8List.fromList([0xFE, 0xFF, 0x00, 0x66])), isTrue);

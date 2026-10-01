@@ -86,6 +86,11 @@ There are **only 5 rules**. Example is [here](https://github.com/sensuikan1973/e
   - By default, the level is 18, all the logical CPUs are used (`n-tasks = auto`), and the depth of the book is the one of your `book.dat` (`book-depth = auto`).
   - `edax.ini` is still read if it exists, but `config.ini` is prioritized.
   - If you run several edax_runner at the same time, set `n-tasks` so that they don't use more threads than your CPU has. (A search of a line of 30 moves or more is short, and more than 8 threads don't make it faster.)
+- Several games can be learned at the same time with `book-store-tasks` of `config.ini`. (`1` by default: a game after the other, as before)
+  - With `book-store-tasks = auto` (or a number), edax_runner takes the next lines of edax vs edax (up to that number) from `learning_list.txt`, and libedax plays them at the same time, then searches the positions of all these games at the same time and stores them. The book is linked, negamaxed and saved once for these games.
+  - It's much faster than running several edax_runner at the same time, and only one `book.dat` is needed. See [the README of Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/README-NIKQUE.en.md) for the measured speed and for how much the book differs from the one learned with `book-store-tasks = 1`.
+  - The games of a group are played with the book as it was before the group, and the moves of each game aren't printed.
+  - `book deviate`, `fix` and a single line of edax vs edax are learned as before.
 - `book.dat` and `learning_list.txt` are replaced after saving to another file, so they aren't broken even if edax_runner is killed while saving.
 
 ## References
