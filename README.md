@@ -85,7 +85,7 @@ There are **only 5 rules**. Example is [here](https://github.com/sensuikan1973/e
 - The settings are in `config.ini`, which is the one of Edax 4.5.5 (nikque). See the comments in it.
   - By default, the level is 18, all the logical CPUs are used (`n-tasks = auto`), and the depth of the book is the one of your `book.dat` (`book-depth = auto`).
   - `edax.ini` is still read if it exists, but `config.ini` is prioritized.
-  - If you run several edax_runner at the same time, set `n-tasks` so that they don't use more threads than your CPU has. For lines of 30 moves or more, many edax_runner with `n-tasks = 1` learn more lines in total than a few edax_runner with many threads.
+  - If you run several edax_runner at the same time, set `n-tasks` so that they don't use more threads than your CPU has. (A search of a line of 30 moves or more is short, and more than 8 threads don't make it faster.)
 - `book.dat` and `learning_list.txt` are replaced after saving to another file, so they aren't broken even if edax_runner is killed while saving.
 
 ## References
