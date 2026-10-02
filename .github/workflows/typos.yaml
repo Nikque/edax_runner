@@ -6,7 +6,7 @@ name: typos
 on:
   push:
     branches:
-      - main
+      - nikque-fixes
   pull_request:
   workflow_dispatch:
 

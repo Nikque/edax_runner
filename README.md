@@ -3,7 +3,7 @@
 ![Dart CI](https://github.com/Nikque/edax_runner/workflows/Dart%20CI/badge.svg)
 
 <p align="center">
-<img src="https://github.com/Nikque/edax_runner/blob/main/resources/logo.png?raw=true" alt="edax-runner" />
+<img src="https://github.com/Nikque/edax_runner/blob/nikque-fixes/resources/logo.png?raw=true" alt="edax-runner" />
 </p>
 
 tiny tool for [edax-reversi](https://github.com/Nikque/edax-reversi-AVX) **auto** learning.
@@ -14,7 +14,7 @@ tiny tool for [edax-reversi](https://github.com/Nikque/edax-reversi-AVX) **auto*
 
 This is a fork of [sensuikan1973/edax_runner](https://github.com/sensuikan1973/edax_runner) which learns with [Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX). See [About this fork](#about-this-fork).
 
-![demo](https://github.com/Nikque/edax_runner/blob/main/resources/demo.gif)
+![demo](https://github.com/Nikque/edax_runner/blob/nikque-fixes/resources/demo.gif)
 
 ## Usage
 
@@ -51,7 +51,7 @@ start ./edax_runner.exe
 
 ### How to write learning_list.txt ?
 
-There are **only 5 rules**. Example is [here](https://github.com/Nikque/edax_runner/blob/main/resources/learning_list.txt).
+There are **only 5 rules**. Example is [here](https://github.com/Nikque/edax_runner/blob/nikque-fixes/resources/learning_list.txt).
 
 | purpose                        | format                                 | example                |
 | :----------------------------- | :------------------------------------- | :--------------------- |
