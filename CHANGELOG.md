@@ -1,3 +1,11 @@
+# 5.3.0+nikque.2
+
+The tag is `v5.3.0-nikque.2`.
+
+- libedax and `config.ini` of [Edax 4.5.5 nikque.8](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.8).
+  - fix: with `book-store-tasks = auto` (the default), learning was slower than with `1` when few positions had to be searched or at a high level: a single game at level 24 took 26 seconds instead of 13, at level 21 6.4 seconds instead of 4.2. The threads are now shared between the searches done at the same time: 6 to 11 seconds at level 24, 2.0 seconds at level 21, and 30 single games at level 18 took 18 seconds instead of 29 (35 with `1`). (measured with the commands of edax)
+  - 128 games at level 18 (32 logical CPUs): 37 to 39 seconds before, 35 to 36 seconds now.
+
 # 5.3.0+nikque.1
 
 The first release of this fork ([Nikque/edax_runner](https://github.com/Nikque/edax_runner)), from 5.3.0 of [sensuikan1973/edax_runner](https://github.com/sensuikan1973/edax_runner). The tag is `v5.3.0-nikque.1`.

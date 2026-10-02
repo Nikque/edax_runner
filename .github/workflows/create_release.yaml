@@ -2,7 +2,7 @@
 name: Create Release
 
 # Run by hand (Actions > Create Release > Run workflow, on the default branch nikque-fixes).
-# The version comes from pubspec.yaml: "5.3.0+nikque.1" makes the tag "v5.3.0-nikque.1".
+# The version comes from pubspec.yaml: "5.3.0+nikque.2" makes the tag "v5.3.0-nikque.2".
 on:
   workflow_dispatch:
 
