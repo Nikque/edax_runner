@@ -1,20 +1,19 @@
 ---
 name: Create Release
 
+# Run by hand. The version comes from pubspec.yaml: "5.3.0+nikque.1" makes the tag "v5.3.0-nikque.1".
 on:
   workflow_dispatch:
-  pull_request:
-    branches: [main]
-    types: [closed]
+
+permissions:
+  contents: write
 
 jobs:
   build:
-    # See: .github/workflows/create_release_pr.yaml
-    if: ${{ github.head_ref == 'prepare_for_release' && github.event.pull_request.merged == true }}
     runs-on: ${{ matrix.runner_machine }}
     timeout-minutes: 10
     outputs:
-      version: ${{ steps.get_version.outputs.version }}
+      tag: ${{ steps.get_version.outputs.tag }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -51,12 +50,12 @@ jobs:
         shell: bash
         run: .github/scripts/output_build_info.sh edax_runner
 
-      - name: get current version
+      - name: get the tag from the version
         id: get_version
         shell: bash
         run: |
-          VERSION=$(dart pub deps --style compact | grep "edax_runner" | cut -c 13-)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          echo "tag=v${VERSION/+/-}" >> "$GITHUB_OUTPUT"
 
       - name: compress files (Windows)
         if: runner.os == 'Windows'
@@ -85,6 +84,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ needs.build.outputs.version }}
+          tag_name: ${{ needs.build.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           files: artifacts/edax_runner-*/*.zip
           generate_release_notes: true

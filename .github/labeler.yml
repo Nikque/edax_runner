@@ -2,14 +2,12 @@
 GitHub Actions:
   - changed-files:
       - any-glob-to-any-file: .github/workflows/**/*
-      - any-glob-to-any-file: .github/dependabot.yml
       - any-glob-to-any-file: .github/labeler.yml
       - any-glob-to-any-file: .github/.typos_config.toml
 
 libedax:
   - changed-files:
       - any-glob-to-any-file: scripts/build_edax_runner.sh
-      - any-glob-to-any-file: scripts/fetch_libedax_assets.sh
       - any-glob-to-any-file: resources/dll/**/*
 
 linux:
