@@ -78,7 +78,7 @@ start ./edax_runner.exe
 | | 元の edax_runner 5.3.0 | この fork |
 | :-- | :-- | :-- |
 | [Edax](#1-edax-44-の代わりに-edax-455-nikque) | Edax 4.4 | Edax 4.5.5 (nikque)：探索が速く、メモリが少ない |
-| [libedax](#2-cpu-に合わせたライブラリ) | OS ごとに1つ | CPU が動かせる中で最も速いもの（x86-64 共通、AVX2、AVX-512） |
+| [libedax](#2-cpu-に合わせたライブラリ) | OS ごとに1つ | CPU が動かせる中で最も速いもの（x86-64 共通、AVX2、AVX-512）。元の libedax の全関数が使え、ほかのソフトからも利用可 |
 | [設定](#3-設定は-configini) | `edax.ini` | Edax 4.5.5 (nikque) の `config.ini`（`edax.ini` も読みます） |
 | [学習](#4-複数の棋譜を同時に学習) | 1局ずつ | 複数の棋譜を同時に：論理CPU 32 で約3倍の速さ |
 | [`learning_list.txt`](#5-learning_listtxt-と保存の修正) | 不具合が8件（下記） | 修正 |
@@ -94,6 +94,8 @@ start ./edax_runner.exe
 
 ### 2. CPU に合わせたライブラリ
 
+`resources/dll/`（と Release の ZIP）に入っているのは、[Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX) の libedax です。**元の libedax の93個の関数がすべて使えます**（名前・引数・データの並びも同じ）。さらに5個の関数（`edax_book_deviate2`、`edax_book_deviate3`、`edax_book_store_games`、`edax_book_store_tasks`、`libedax_cpu_level`）を追加しています。edax_runner 自身が使うのは、そのうちの一部だけです。
+
 libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お使いの CPU が動かせる中で最も速いものを使います（Windows と Linux。Mac の `libedax.universal.dylib` は、Apple silicon と Intel の両用です）。
 
 | CPU                  | Windows              | Linux           |
@@ -103,6 +105,8 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 | x86-64-v4（AVX-512） | `libedax-x64-v4.dll` | `libedax-v4.so` |
 
 どれを使っているかは、`[edax_runner] use "libedax-x64-v4.dll".` のように表示します。
+
+**このライブラリをほかのソフトで使う場合**：ライブラリは edax_runner 専用ではありません。libedax 用に書かれたプログラム（[libedax4dart](https://pub.dev/packages/libedax4dart) を使うもの、C・Python・C# などから `libedax.h` の関数を呼ぶもの）なら、ライブラリと `data/eval.dat` をプログラムと同じフォルダに置けば使えます。ヘッダー（`src/libedax.h`）、短い使用例（`tests/libedax_example.c`）、元の libedax との違い、Android 用のライブラリについては、[Edax 4.5.5 (nikque) の README](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/README-NIKQUE.ja.md)の「libedax：Edaxをライブラリとして使う」を見てください。ライブラリは、その [Releases](https://github.com/Nikque/edax-reversi-AVX/releases) の ZIP にも入っています。
 
 ### 3. 設定は config.ini
 

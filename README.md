@@ -78,7 +78,7 @@ Compared with the original edax_runner 5.3.0:
 | | Original edax_runner 5.3.0 | This fork |
 | :-- | :-- | :-- |
 | [Edax](#1-edax-455-nikque-instead-of-edax-44) | Edax 4.4 | Edax 4.5.5 (nikque): faster searches, less memory |
-| [libedax](#2-a-library-for-each-level-of-cpu) | one library per OS | the fastest one which your CPU can run (any x86-64, AVX2, AVX-512) |
+| [libedax](#2-a-library-for-each-level-of-cpu) | one library per OS | the fastest one which your CPU can run (any x86-64, AVX2, AVX-512); all the functions of the original libedax, usable by other programs too |
 | [Settings](#3-settings-in-configini) | `edax.ini` | `config.ini` of Edax 4.5.5 (nikque) (`edax.ini` is still read) |
 | [Learning](#4-several-games-are-learned-at-the-same-time) | a game after the other | several games at the same time: about 3 times faster with 32 logical CPUs |
 | [`learning_list.txt`](#5-fixes-of-learning_listtxt-and-of-saving) | 8 bugs (below) | fixed |
@@ -94,6 +94,8 @@ The way to use it and the format of `learning_list.txt` are the same.
 
 ### 2. A library for each level of CPU
 
+`resources/dll/` (and the Release archives) hold the libedax of [Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX): **all the 93 functions of the original libedax are available**, with the same names, arguments and data layout, and 5 more (`edax_book_deviate2`, `edax_book_deviate3`, `edax_book_store_games`, `edax_book_store_tasks`, `libedax_cpu_level`). edax_runner itself only uses a few of them.
+
 libedax is built for several levels of CPU, and edax_runner uses the fastest one which your CPU can run. (Windows, Linux; on Mac, `libedax.universal.dylib` is for Apple silicon and Intel)
 
 | CPU                  | Windows              | Linux           |
@@ -103,6 +105,8 @@ libedax is built for several levels of CPU, and edax_runner uses the fastest one
 | x86-64-v4 (AVX-512)  | `libedax-x64-v4.dll` | `libedax-v4.so` |
 
 edax_runner prints the one which it uses, like `[edax_runner] use "libedax-x64-v4.dll".`
+
+**Using these libraries in another program**: they are not tied to edax_runner. Any program written for libedax (with [libedax4dart](https://pub.dev/packages/libedax4dart), or calling the functions of `libedax.h` from C, Python, C#, ...) can use them: put the library and `data/eval.dat` next to the program. The header (`src/libedax.h`), a short example (`tests/libedax_example.c`), the differences from the original libedax and the libraries for Android are in [the README of Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/README-NIKQUE.en.md) ("libedax: Edax as a library"); the libraries are also in the ZIP of its [Releases](https://github.com/Nikque/edax-reversi-AVX/releases).
 
 ### 3. Settings in config.ini
 
