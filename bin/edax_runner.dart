@@ -182,15 +182,23 @@ class _NikqueLibEdax {
           .lookupFunction<
             Int32 Function(Pointer<Utf8>),
             int Function(Pointer<Utf8>)
-          >('edax_book_save_to');
+          >('edax_book_save_checked');
     } on ArgumentError {
       // NOTE: libedax of Edax 4.5.5 nikque.7 and nikque.8 doesn't have this function.
+    }
+    try {
+      _failed = library.lookupFunction<Int32 Function(), int Function()>(
+        'edax_book_failed',
+      );
+    } on ArgumentError {
+      // NOTE: the same.
     }
   }
 
   int Function()? _storeTasks;
   int Function(Pointer<Utf8>, Pointer<Utf8>)? _storeGames;
   int Function(Pointer<Utf8>)? _saveTo;
+  int Function()? _failed;
 
   /// The number of games to learn at the same time. (`book-store-tasks`)
   int get tasks => _storeGames == null ? 1 : (_storeTasks?.call() ?? 1);
@@ -218,6 +226,18 @@ class _NikqueLibEdax {
       calloc
         ..free(games)
         ..free(status);
+    }
+  }
+
+  /// Throw [StateError] if the last book function of edax couldn't add a position to the book.
+  /// (an older libedax doesn't tell it)
+  void checkBook() {
+    if ((_failed?.call() ?? 0) != 0) {
+      // NOTE: the line is kept in learning list: it is learned at the next run.
+      throw StateError(
+        'edax could not add a position to the book (not enough memory?).'
+        ' "$_learningListFile" and "$_bookFile" are not changed.',
+      );
     }
   }
 
@@ -427,7 +447,7 @@ void _saveBook(final LibEdax edax) {
   _print('book save...');
   // NOTE: `edax_book_save` doesn't tell whether it has saved the book
   // (e.g. it can't replace the book while another program opens it).
-  // So, let edax save to another file, check the result (`edax_book_save_to`, since Edax 4.5.5 nikque.9)
+  // So, let edax save to another file, check the result (`edax_book_save_checked`, since Edax 4.5.5 nikque.9)
   // and the file, and replace the book with it.
   // The book isn't broken even if edax_runner is killed while saving.
   final saving = File('$_bookFile$_savingExt');
@@ -447,6 +467,7 @@ void _doEdaxBookFix(final LibEdax edax) {
   edax
     ..edaxBookFix()
     ..edaxPlayPrint();
+  _nikque.checkBook();
   _print('has finished book fix.');
   _saveBook(edax);
 }
@@ -469,6 +490,7 @@ String? _doEdaxVsEdaxWithRandomness(
   );
   _print('book store...');
   edax.edaxBookStore();
+  _nikque.checkBook();
   _print('has finished book store.');
   _saveBook(edax);
   return null;
@@ -483,6 +505,7 @@ String? _doEdaxBookDeviate(
   if (!_play(edax, moves)) return 'illegal move';
   stdout.writeln();
   edax.edaxBookDeviate(relativeError, absoluteError);
+  _nikque.checkBook();
   _print(
     'has finished book deviate.'
     ' moves: $moves, relativeError: $relativeError, absoluteError: $absoluteError.',
