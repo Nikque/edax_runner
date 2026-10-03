@@ -14,10 +14,9 @@ const String _configFile = 'config.ini';
 const String _oldConfigFile = 'edax.ini';
 const String _savingExt = '.saving';
 const String _moves = '((?:[a-hA-H][1-8])+)';
-final _edaxVsEdaxRegexp = RegExp('^$_moves\$'); // e.g. "f5f6f7"
-final _edaxVsEdaxWithRandomnessRegexp = RegExp(
-  '^(\\d+)\\s*,\\s*$_moves\$',
-); // e.g. "3,f5f6f7"
+final _edaxVsEdaxRegexp = RegExp(
+  '^(?:(\\d+)\\s*,\\s*)?$_moves\$',
+); // e.g. "f5f6f7", "3,f5f6f7"
 final _bookDeviateRegexp = RegExp(
   '^\\[\\s*(\\d+)\\s+(\\d+)\\s*\\]\\s*$_moves\$',
 ); // e.g. "[1 3] f5f6f7"
@@ -68,10 +67,11 @@ void main(final List<String> arguments) {
   }
 
   while (true) {
-    final games = gamesLearner.tasks > 1
+    final tasks = gamesLearner.tasks;
+    final games = tasks > 1
         ? findEntries(
             learningList,
-            max: gamesLearner.tasks,
+            max: tasks,
             accept: (final text) => _gameLine(text) != null,
           )
         : const <LearningEntry>[];
@@ -169,8 +169,6 @@ class _GamesLearner {
           >('edax_book_store_games');
     } on ArgumentError {
       // NOTE: the original libedax doesn't have these functions.
-      _storeTasks = null;
-      _storeGames = null;
     }
   }
 
@@ -196,18 +194,29 @@ class _GamesLearner {
   }
 }
 
-/// Return `{book-randomness},{moves}` if [text] is a game of edax vs edax.
-String? _gameLine(final String text) {
-  var match = _edaxVsEdaxRegexp.firstMatch(text);
-  if (match != null) return '0,${match.group(1)!}';
-
-  match = _edaxVsEdaxWithRandomnessRegexp.firstMatch(text);
+/// Return the moves and the book-randomness (0 by default; null if too large)
+/// if [text] is a game of edax vs edax.
+({String moves, int? randomness})? _parseGame(final String text) {
+  final match = _edaxVsEdaxRegexp.firstMatch(text);
   if (match == null) return null;
-  final randomness = int.tryParse(match.group(1)!);
+  return (moves: match.group(2)!, randomness: _parseNumber(match.group(1)));
+}
+
+/// Return the number of [digits] (0 if null), or null if it's too large.
+int? _parseNumber(final String? digits) {
+  final number = digits == null ? 0 : int.tryParse(digits);
+  return number == null || number > _maxNumber ? null : number;
+}
+
+/// Return `{book-randomness},{moves}` if [text] is a game of edax vs edax
+/// which can be learned with other games.
+String? _gameLine(final String text) {
+  final game = _parseGame(text);
+  final randomness = game?.randomness;
   // NOTE: `edax_book_store_games` doesn't learn a game with a larger randomness.
   // Such a game is learned alone, as before.
   if (randomness == null || randomness > _maxRandomnessOfGames) return null;
-  return '$randomness,${match.group(2)!}';
+  return '$randomness,${game!.moves}';
 }
 
 /// Learn the games of [texts] at the same time, and return the new content of learning list.
@@ -258,28 +267,18 @@ String? _learn(final LibEdax edax, final String text) {
     return null;
   }
 
-  var match = _edaxVsEdaxRegexp.firstMatch(text);
-  if (match != null) {
-    return _doEdaxVsEdaxWithRandomness(edax, match.group(1)!, 0);
+  final game = _parseGame(text);
+  if (game != null) {
+    final randomness = game.randomness;
+    if (randomness == null) return 'too large number';
+    return _doEdaxVsEdaxWithRandomness(edax, game.moves, randomness);
   }
 
-  match = _edaxVsEdaxWithRandomnessRegexp.firstMatch(text);
+  final match = _bookDeviateRegexp.firstMatch(text);
   if (match != null) {
-    final randomness = int.tryParse(match.group(1)!);
-    if (randomness == null || randomness > _maxNumber) {
-      return 'too large number';
-    }
-    return _doEdaxVsEdaxWithRandomness(edax, match.group(2)!, randomness);
-  }
-
-  match = _bookDeviateRegexp.firstMatch(text);
-  if (match != null) {
-    final relativeError = int.tryParse(match.group(1)!);
-    final absoluteError = int.tryParse(match.group(2)!);
-    if (relativeError == null ||
-        absoluteError == null ||
-        relativeError > _maxNumber ||
-        absoluteError > _maxNumber) {
+    final relativeError = _parseNumber(match.group(1));
+    final absoluteError = _parseNumber(match.group(2));
+    if (relativeError == null || absoluteError == null) {
       return 'too large number';
     }
     return _doEdaxBookDeviate(
@@ -321,14 +320,9 @@ Uint8List _removeLearnedTexts(
   );
   // NOTE: don't overwrite learning list directly,
   // so that it isn't broken even if edax_runner is killed while saving.
-  _retry(() {
-    File(
-      '$_learningListFile$_savingExt',
-    ).writeAsBytesSync(taken.rest, flush: true);
-  });
-  _retry(
-    () => File('$_learningListFile$_savingExt').renameSync(_learningListFile),
-  );
+  final saving = File('$_learningListFile$_savingExt');
+  _retry(() => saving.writeAsBytesSync(taken.rest, flush: true));
+  _retry(() => saving.renameSync(_learningListFile));
   return taken.rest;
 }
 
