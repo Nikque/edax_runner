@@ -1,10 +1,17 @@
 # 5.3.0+nikque.3
 
-The tag is `v5.3.0-nikque.3`. libedax and `config.ini` are the same as 5.3.0+nikque.2. (Edax 4.5.5 nikque.8)
+The tag is `v5.3.0-nikque.3`.
+
+- libedax and `config.ini` of [Edax 4.5.5 nikque.9](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.9): the bugs found by a final audit of Edax 4.5.5 nikque.8 are fixed. (see its release notes)
+  - fix of the search with several threads: a move could be left unsearched in a node (rare wrong results; a bug of the original Edax 4.5.5). The search with one thread is unchanged.
+  - fix: a line of `learning_list.txt` longer than 255 bytes because of spaces between its moves could be learned as a shorter game.
+  - fix: a book file which couldn't be read at startup (damaged, or opened by another program) was overwritten after learning. Now it is kept as `book.dat.damaged`.
+  - when the memory for the searches done at the same time isn't available, edax goes on with fewer searches instead of terminating.
 
 - fix: a failure of saving `book.dat` (e.g. another program opens `book.dat`) wasn't noticed, and the learned lines were removed from `learning_list.txt`. If edax_runner ended after that, they weren't in `book.dat`.
-  - Now edax saves the book to another file (`data/book.dat.saving`), and `book.dat` is replaced with it after checking that it has been saved. Saving is retried every second, up to 30 times; if the book still can't be saved, edax_runner stops without changing `learning_list.txt`.
-- fix: when several games are learned at the same time (`book-store-tasks` >= 2), a line whose `book-randomness` is 128 or more (e.g. `200,F5F6`) wasn't learned, and was recorded as `skipped (illegal move)`. Now such a line is learned alone. (as with `book-store-tasks = 1`)
+  - Now edax saves the book to another file (`data/book.dat.saving`), and `book.dat` is replaced with it after checking that it has been saved (with `edax_book_save_to`, a new function of libedax which tells it, and by looking at the file). Saving is retried every second, up to 30 times; if the book still can't be saved, edax_runner stops without changing `learning_list.txt`.
+- fix: when several games are learned at the same time (`book-store-tasks` >= 2), a line whose `book-randomness` is 128 or more (e.g. `200,F5F6`) wasn't learned, and was recorded as `skipped (illegal move)`. Now such a line is learned with the other games. (libedax of Edax 4.5.5 nikque.9 has no limit; with an older libedax, such a line is learned alone, as with `book-store-tasks = 1`)
+- if edax can't add the positions of the games learned at the same time to the book (not enough memory), edax_runner stops without changing `learning_list.txt`. (libedax of Edax 4.5.5 nikque.9 tells it; before, the lines were removed as learned)
 - fix: a number larger than 2147483647 in `[relativeError absoluteError]` was passed to edax as another number. (e.g. 4294967296 as 0) Now the line is skipped as `too large number`.
 - fix: when the last byte of a skipped line was 0x85 or 0xA0 (e.g. a character of Shift_JIS), the byte was lost in `learned_log.txt`.
 - `scripts/build_edax_runner.sh` stops if a command fails. (it went on and ended successfully even if the libraries couldn't be copied)

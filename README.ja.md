@@ -170,6 +170,7 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 
 | edax_runner | Edax | |
 | :-- | :-- | :-- |
+| [5.3.0+nikque.3](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.3) | [4.5.5 nikque.9](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.9) | 総点検で見つかった不具合の修正（book を保存できなかったことに気づく、複数スレッドの探索、長い行、読めなかった book ファイル） |
 | [5.3.0+nikque.2](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.2) | [4.5.5 nikque.8](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.8) | 探索する局面が少ないときや level が高いときに速く（level 24 の1局：26秒 → 6〜11秒） |
 | [5.3.0+nikque.1](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.1) | [4.5.5 nikque.7](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.7) | この fork の最初の版 |
 

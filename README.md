@@ -170,6 +170,7 @@ Other changes:
 
 | edax_runner | Edax | |
 | :-- | :-- | :-- |
+| [5.3.0+nikque.3](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.3) | [4.5.5 nikque.9](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.9) | bug fixes found by a final audit (a book that wasn't saved is noticed, the search with several threads, long lines, a book file that can't be read) |
 | [5.3.0+nikque.2](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.2) | [4.5.5 nikque.8](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.8) | faster when few positions are searched or at a high level (a single game at level 24: 26 seconds before, 6 to 11 seconds now) |
 | [5.3.0+nikque.1](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.1) | [4.5.5 nikque.7](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.7) | the first version of this fork |
 

@@ -24,8 +24,9 @@ final _bookDeviateRegexp = RegExp(
 /// libedax takes these numbers as 32 bit integers.
 const int _maxNumber = 0x7FFFFFFF;
 
-/// The largest `book-randomness` of a game which libedax learns with other games.
-const int _maxRandomnessOfGames = 127;
+/// The largest `book-randomness` of a game which libedax of Edax 4.5.5 nikque.7 and nikque.8
+/// learns with other games. (no limit since nikque.9)
+const int _maxRandomnessOfOldGames = 127;
 const int _fileRetryCount = 30;
 const Duration _fileRetryInterval = Duration(seconds: 1);
 
@@ -49,6 +50,8 @@ void main(final List<String> arguments) {
 
   var learningList = _readLearningList();
   final libraryPath = _edaxSharedLibraryPath();
+  // NOTE: with `book-store-tasks` of `config.ini`, libedax learns several games at the same time.
+  final gamesLearner = _nikque = _NikqueLibEdax(libraryPath);
   final edax = LibEdax(libraryPath)
     ..libedaxInitialize([
       '',
@@ -60,8 +63,6 @@ void main(final List<String> arguments) {
     ..edaxEnableBookVerbose()
     ..edaxPlayPrint();
 
-  // NOTE: with `book-store-tasks` of `config.ini`, libedax learns several games at the same time.
-  final gamesLearner = _GamesLearner(libraryPath);
   if (gamesLearner.tasks > 1) {
     _print('learn up to ${gamesLearner.tasks} games at the same time.');
   }
@@ -154,11 +155,17 @@ int _cpuLevel(final String libraryPath) {
   }
 }
 
+/// What libedax did with a game of `edax_book_store_games`.
+enum _GameResult { learned, illegalMove, failed }
+
 /// The functions of libedax (Edax 4.5.5 nikque) which libedax4dart doesn't have.
-class _GamesLearner {
-  _GamesLearner(final String libraryPath) {
+late final _NikqueLibEdax _nikque;
+
+class _NikqueLibEdax {
+  _NikqueLibEdax(final String libraryPath) {
+    final DynamicLibrary library;
     try {
-      final library = DynamicLibrary.open(libraryPath);
+      library = DynamicLibrary.open(libraryPath);
       _storeTasks = library.lookupFunction<Int32 Function(), int Function()>(
         'edax_book_store_tasks',
       );
@@ -168,28 +175,62 @@ class _GamesLearner {
             int Function(Pointer<Utf8>, Pointer<Utf8>)
           >('edax_book_store_games');
     } on ArgumentError {
-      // NOTE: the original libedax doesn't have these functions.
+      return; // NOTE: the original libedax doesn't have these functions.
+    }
+    try {
+      _saveTo = library
+          .lookupFunction<
+            Int32 Function(Pointer<Utf8>),
+            int Function(Pointer<Utf8>)
+          >('edax_book_save_to');
+    } on ArgumentError {
+      // NOTE: libedax of Edax 4.5.5 nikque.7 and nikque.8 doesn't have this function.
     }
   }
 
   int Function()? _storeTasks;
   int Function(Pointer<Utf8>, Pointer<Utf8>)? _storeGames;
+  int Function(Pointer<Utf8>)? _saveTo;
 
   /// The number of games to learn at the same time. (`book-store-tasks`)
   int get tasks => _storeGames == null ? 1 : (_storeTasks?.call() ?? 1);
 
+  /// The largest `book-randomness` of a game which libedax learns with other games.
+  int get maxRandomnessOfGames =>
+      _saveTo == null ? _maxRandomnessOfOldGames : _maxNumber;
+
   /// Play and learn the games of [lines] (`{book-randomness},{moves}` for each),
-  /// and return whether each game has been learned.
-  List<bool> learn(final List<String> lines) {
+  /// and return what has been done with each game.
+  List<_GameResult> learn(final List<String> lines) {
     final games = lines.join('\n').toNativeUtf8();
     final status = calloc<Uint8>(lines.length + 1);
     try {
       _storeGames!(games, status.cast());
-      return [for (var i = 0; i < lines.length; i++) status[i] == 0x31];
+      return [
+        for (var i = 0; i < lines.length; i++)
+          switch (status[i]) {
+            0x31 => _GameResult.learned,
+            0x30 => _GameResult.illegalMove,
+            _ => _GameResult.failed, // '2' (since nikque.9), or nothing
+          },
+      ];
     } finally {
       calloc
         ..free(games)
         ..free(status);
+    }
+  }
+
+  /// Save the book to [path], and return whether it has been saved.
+  /// Return null if libedax doesn't have the function which tells it.
+  bool? saveBook(final String path) {
+    final saveTo = _saveTo;
+    if (saveTo == null) return null;
+    final file = path.toNativeUtf8();
+    try {
+      return saveTo(file) != 0;
+    } finally {
+      calloc.free(file);
     }
   }
 }
@@ -213,31 +254,41 @@ int? _parseNumber(final String? digits) {
 String? _gameLine(final String text) {
   final game = _parseGame(text);
   final randomness = game?.randomness;
-  // NOTE: `edax_book_store_games` doesn't learn a game with a larger randomness.
+  // NOTE: `edax_book_store_games` of an old libedax doesn't learn a game with a larger randomness.
   // Such a game is learned alone, as before.
-  if (randomness == null || randomness > _maxRandomnessOfGames) return null;
+  if (randomness == null || randomness > _nikque.maxRandomnessOfGames) {
+    return null;
+  }
   return '$randomness,${game!.moves}';
 }
 
 /// Learn the games of [texts] at the same time, and return the new content of learning list.
 Uint8List _learnGames(
   final LibEdax edax,
-  final _GamesLearner gamesLearner,
+  final _NikqueLibEdax gamesLearner,
   final List<String> texts,
 ) {
   _print('start to learn ${texts.length} games.');
   texts.forEach(stdout.writeln);
   stdout.writeln();
-  final learned = gamesLearner.learn(
+  final results = gamesLearner.learn(
     texts.map((final text) => _gameLine(text)!).toList(),
   );
   stdout.writeln();
+  if (results.contains(_GameResult.failed)) {
+    // NOTE: the games are kept in learning list: they are learned at the next run.
+    throw StateError(
+      'edax could not learn the games (not enough memory?).'
+      ' "$_learningListFile" and "$_bookFile" are not changed.',
+    );
+  }
   final skipReasons = [
-    for (final isLearned in learned) isLearned ? null : 'illegal move',
+    for (final result in results)
+      result == _GameResult.learned ? null : 'illegal move',
   ];
   _print(
     'has finished edax vs edax and book store of '
-    '${learned.where((final isLearned) => isLearned).length} games.',
+    '${results.where((final result) => result == _GameResult.learned).length} games.',
   );
   for (var i = 0; i < texts.length; i++) {
     if (skipReasons[i] != null) {
@@ -374,15 +425,17 @@ bool _play(final LibEdax edax, final String moves) {
 /// Save the book, or throw [FileSystemException] if it can't be saved.
 void _saveBook(final LibEdax edax) {
   _print('book save...');
-  // NOTE: edax doesn't tell whether it has saved the book
+  // NOTE: `edax_book_save` doesn't tell whether it has saved the book
   // (e.g. it can't replace the book while another program opens it).
-  // So, let edax save to another file, check the file, and replace the book with it.
+  // So, let edax save to another file, check the result (`edax_book_save_to`, since Edax 4.5.5 nikque.9)
+  // and the file, and replace the book with it.
   // The book isn't broken even if edax_runner is killed while saving.
   final saving = File('$_bookFile$_savingExt');
   _retry(() {
     if (saving.existsSync()) saving.deleteSync();
-    edax.edaxBookSave(saving.path);
-    if (!saving.existsSync()) {
+    final saved = _nikque.saveBook(saving.path);
+    if (saved == null) edax.edaxBookSave(saving.path);
+    if (saved == false || !saving.existsSync()) {
       throw FileSystemException('edax could not save the book', saving.path);
     }
   });

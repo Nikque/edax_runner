@@ -6,11 +6,18 @@
 
 ## 5.3.0+nikque.3
 
-タグは `v5.3.0-nikque.3` です。libedax と `config.ini` は 5.3.0+nikque.2 と同じです（Edax 4.5.5 nikque.8）。
+タグは `v5.3.0-nikque.3` です。
+
+- libedax と `config.ini` を [Edax 4.5.5 nikque.9](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.9) のものにしました。Edax 4.5.5 nikque.8 の総点検で見つかった不具合の修正です（詳しくは Edax の修正一覧）。
+  - 複数スレッドの探索の修正：手が探索されないままになるノードができることがありました（結果を誤ることはまれ。元の Edax 4.5.5 からある不具合）。1スレッドの探索は変わりません。
+  - 修正：`learning_list.txt` の行が、手の間の空白のために255バイトを超えると、短い手順として学習されることがありました。
+  - 修正：起動時に読めなかった book ファイル（壊れている、ほかのプログラムが開いている）が、学習の後で上書きされていました。`book.dat.damaged` として残します。
+  - 同時に行う探索のメモリが確保できないとき、終了せずに、同時に行う探索を減らして続けます。
 
 - 修正：`book.dat` を保存できなかったとき（ほかのプログラムが `book.dat` を開いている、など）に、それに気づかず、学習した行を `learning_list.txt` から消していました。そのまま edax_runner が終わると、その学習は `book.dat` に残りませんでした。
-  - book を別のファイル（`data/book.dat.saving`）に保存させ、保存できたことを確かめてから `book.dat` と置き換えるようにしました。保存できないときは1秒おきに30回までやり直し、それでも保存できなければ、`learning_list.txt` を変えずに止まります。
-- 修正：複数の棋譜を同時に学習するとき（`book-store-tasks` が 2 以上）、`book-randomness` が 128 以上の行（例：`200,F5F6`）が、学習されずに `skipped (illegal move)` と記録されていました。このような行は、1局ずつ学習します（`book-store-tasks = 1` のときと同じ）。
+  - book を別のファイル（`data/book.dat.saving`）に保存させ、保存できたことを確かめてから（libedax に足した、成否を返す関数 `edax_book_save_to` と、ファイルの確認）`book.dat` と置き換えるようにしました。保存できないときは1秒おきに30回までやり直し、それでも保存できなければ、`learning_list.txt` を変えずに止まります。
+- 修正：複数の棋譜を同時に学習するとき（`book-store-tasks` が 2 以上）、`book-randomness` が 128 以上の行（例：`200,F5F6`）が、学習されずに `skipped (illegal move)` と記録されていました。このような行も、ほかの棋譜と一緒に学習します（Edax 4.5.5 nikque.9 の libedax には上限がありません。それより前の libedax では、1局ずつ学習します＝`book-store-tasks = 1` のときと同じ）。
+- 同時に学習した棋譜の局面を edax が book に追加できなかったとき（メモリ不足）は、`learning_list.txt` を変えずに止まります（Edax 4.5.5 nikque.9 の libedax が失敗を知らせます。それまでは、学習済みとして行を消していました）。
 - 修正：`[relativeError absoluteError]` の数字が 2147483647 より大きいと、別の数字として edax に渡っていました（例：4294967296 は 0）。`too large number` として飛ばします。
 - 修正：飛ばした行の最後のバイトが 0x85・0xA0 のとき（Shift_JIS の「あ」など）、`learned_log.txt` に記録するときにそのバイトが落ちていました。
 - `scripts/build_edax_runner.sh` は、途中のコマンドが失敗したら止まるようにしました（ライブラリのコピーに失敗しても、最後まで進んで成功として終わっていました）。
