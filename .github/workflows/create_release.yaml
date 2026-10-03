@@ -10,7 +10,27 @@ permissions:
   contents: write
 
 jobs:
+  # Stop if the release of this version already exists:
+  # otherwise its files would be replaced, while its tag stays on the old commit.
+  # (to create it again on purpose, delete the release and the tag first)
+  check_tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: stop if the tag of the version already exists
+        shell: bash
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          TAG="v${VERSION/+/-}"
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" > /dev/null; then
+            echo "::error::the tag $TAG already exists. Update the version of pubspec.yaml."
+            exit 1
+          fi
+          echo "the tag $TAG doesn't exist yet."
+
   build:
+    needs: check_tag
     runs-on: ${{ matrix.runner_machine }}
     timeout-minutes: 10
     outputs:

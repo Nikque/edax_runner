@@ -8,6 +8,8 @@ The tag is `v5.3.0-nikque.3`. libedax and `config.ini` are the same as 5.3.0+nik
 - fix: a number larger than 2147483647 in `[relativeError absoluteError]` was passed to edax as another number. (e.g. 4294967296 as 0) Now the line is skipped as `too large number`.
 - fix: when the last byte of a skipped line was 0x85 or 0xA0 (e.g. a character of Shift_JIS), the byte was lost in `learned_log.txt`.
 - `scripts/build_edax_runner.sh` stops if a command fails. (it went on and ended successfully even if the libraries couldn't be copied)
+- `Create Release` stops if the tag of the version already exists. (run again with the same version, it replaced the files of the published release)
+- remove the workflow which labels pull requests (`labeling_pr.yaml`, `.github/labeler.yml`): it's not used in this fork.
 - add tests: `learning_list.txt` edited while learning. (the same lines, lines inserted, moved or removed)
 
 # 5.3.0+nikque.2
