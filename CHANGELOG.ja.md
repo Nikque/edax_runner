@@ -4,6 +4,18 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。
 
+## 5.3.0+nikque.3
+
+タグは `v5.3.0-nikque.3` です。libedax と `config.ini` は 5.3.0+nikque.2 と同じです（Edax 4.5.5 nikque.8）。
+
+- 修正：`book.dat` を保存できなかったとき（ほかのプログラムが `book.dat` を開いている、など）に、それに気づかず、学習した行を `learning_list.txt` から消していました。そのまま edax_runner が終わると、その学習は `book.dat` に残りませんでした。
+  - book を別のファイル（`data/book.dat.saving`）に保存させ、保存できたことを確かめてから `book.dat` と置き換えるようにしました。保存できないときは1秒おきに30回までやり直し、それでも保存できなければ、`learning_list.txt` を変えずに止まります。
+- 修正：複数の棋譜を同時に学習するとき（`book-store-tasks` が 2 以上）、`book-randomness` が 128 以上の行（例：`200,F5F6`）が、学習されずに `skipped (illegal move)` と記録されていました。このような行は、1局ずつ学習します（`book-store-tasks = 1` のときと同じ）。
+- 修正：`[relativeError absoluteError]` の数字が 2147483647 より大きいと、別の数字として edax に渡っていました（例：4294967296 は 0）。`too large number` として飛ばします。
+- 修正：飛ばした行の最後のバイトが 0x85・0xA0 のとき（Shift_JIS の「あ」など）、`learned_log.txt` に記録するときにそのバイトが落ちていました。
+- `scripts/build_edax_runner.sh` は、途中のコマンドが失敗したら止まるようにしました（ライブラリのコピーに失敗しても、最後まで進んで成功として終わっていました）。
+- 試験を追加しました：学習中に `learning_list.txt` を書き換えた場合（同じ行が複数ある、行が挿入された・移動された・消された）。
+
 ## 5.3.0+nikque.2
 
 タグは `v5.3.0-nikque.2` です。

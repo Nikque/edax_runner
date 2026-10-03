@@ -1,3 +1,15 @@
+# 5.3.0+nikque.3
+
+The tag is `v5.3.0-nikque.3`. libedax and `config.ini` are the same as 5.3.0+nikque.2. (Edax 4.5.5 nikque.8)
+
+- fix: a failure of saving `book.dat` (e.g. another program opens `book.dat`) wasn't noticed, and the learned lines were removed from `learning_list.txt`. If edax_runner ended after that, they weren't in `book.dat`.
+  - Now edax saves the book to another file (`data/book.dat.saving`), and `book.dat` is replaced with it after checking that it has been saved. Saving is retried every second, up to 30 times; if the book still can't be saved, edax_runner stops without changing `learning_list.txt`.
+- fix: when several games are learned at the same time (`book-store-tasks` >= 2), a line whose `book-randomness` is 128 or more (e.g. `200,F5F6`) wasn't learned, and was recorded as `skipped (illegal move)`. Now such a line is learned alone. (as with `book-store-tasks = 1`)
+- fix: a number larger than 2147483647 in `[relativeError absoluteError]` was passed to edax as another number. (e.g. 4294967296 as 0) Now the line is skipped as `too large number`.
+- fix: when the last byte of a skipped line was 0x85 or 0xA0 (e.g. a character of Shift_JIS), the byte was lost in `learned_log.txt`.
+- `scripts/build_edax_runner.sh` stops if a command fails. (it went on and ended successfully even if the libraries couldn't be copied)
+- add tests: `learning_list.txt` edited while learning. (the same lines, lines inserted, moved or removed)
+
 # 5.3.0+nikque.2
 
 The tag is `v5.3.0-nikque.2`.

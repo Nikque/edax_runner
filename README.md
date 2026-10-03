@@ -68,7 +68,7 @@ There are **only 5 rules**. Example is [here](https://github.com/Nikque/edax_run
   - What's `book deviate` ?: See [edax document](https://sensuikan1973.github.io/edax-reversi/book_8c.html#ae9ee489a468274fd83808c53da0418c9), [Choirokoitia document](https://choi.lavox.net/edax/start)
   - Blank lines are ignored.
   - A line which can't be learned (unknown format, illegal move) is skipped. It's recorded in `learned_log.txt` as a comment like `// [edax_runner] skipped (illegal move): F5F5`.
-  - You can edit `learning_list.txt` while edax_runner is running. edax_runner reads it again whenever it has finished learning a line. For example, you can stop edax_runner after the current line by adding `exit` to the head.
+  - You can edit `learning_list.txt` while edax_runner is running. edax_runner reads it again whenever it has finished learning a line (or a group of games learned at the same time). For example, you can stop edax_runner after the current line (or group) by adding `exit` to the head.
   - The comments can be written in any encoding except UTF-16.
 
 ## What this fork changes
@@ -152,6 +152,8 @@ Other changes:
 - `[0 0]F5F6`, `[ 0 0 ] F5F6` and `2, F5F6` are accepted.
 - The directory of the executable is used if `learning_list.txt` isn't in the current directory.
 - `learning_list.txt` is handled faster with less memory (it's handled as bytes, and read once per line to learn).
+- If `book.dat` can't be saved (e.g. another program opens `book.dat`), saving is retried every second, up to 30 times. If it still can't be saved, edax_runner stops without changing `learning_list.txt`. (since 5.3.0+nikque.3; before, the lines were removed as learned even if the book wasn't saved)
+- `book.dat`, `learning_list.txt` and `learned_log.txt` aren't broken even if edax_runner is killed. The line being learned (or the group of games being learned at the same time) is learned from the beginning at the next run. If edax_runner is killed right after saving the book (before rewriting `learning_list.txt`), the line (or group) is learned once more, and can be recorded twice in `learned_log.txt`.
 
 ### Where the changes are
 

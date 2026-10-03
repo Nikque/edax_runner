@@ -70,7 +70,7 @@ LearningEntry? _findEntryFrom(
   while (start < bytes.length) {
     final lf = bytes.indexOf(_lf, start);
     final end = lf < 0 ? bytes.length : lf + 1;
-    final line = latin1.decode(Uint8List.sublistView(bytes, start, end)).trim();
+    final line = _trim(bytes, start, end);
     if (line.isNotEmpty &&
         !line.contains(commentHead) &&
         (text == null || line == text)) {
@@ -80,6 +80,24 @@ LearningEntry? _findEntryFrom(
   }
   return null;
 }
+
+/// The line of [bytes] from [start] to [end], without the white spaces of both ends.
+///
+/// NOTE: `String.trim` also removes 0x85 and 0xA0,
+/// which can be the last byte of a character. (e.g. of Shift_JIS)
+String _trim(final Uint8List bytes, final int start, final int end) {
+  var from = start;
+  var to = end;
+  while (from < to && _isSpace(bytes[from])) {
+    from++;
+  }
+  while (from < to && _isSpace(bytes[to - 1])) {
+    to--;
+  }
+  return latin1.decode(Uint8List.sublistView(bytes, from, to));
+}
+
+bool _isSpace(final int byte) => byte == 0x20 || (byte >= 0x09 && byte <= 0x0D);
 
 /// Find the first texts to learn in [bytes], as long as [accept] returns true, up to [max] texts.
 ///

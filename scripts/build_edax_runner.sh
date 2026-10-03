@@ -1,5 +1,5 @@
 #!/bin/bash
-set -uxo pipefail
+set -euxo pipefail
 
 # $1: name of the executable (e.g. edax_runner.exe)
 # $2: pattern of the libedax libraries of the OS (e.g. "libedax-x64*.dll").

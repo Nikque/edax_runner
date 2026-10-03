@@ -21,6 +21,12 @@ final _edaxVsEdaxWithRandomnessRegexp = RegExp(
 final _bookDeviateRegexp = RegExp(
   '^\\[\\s*(\\d+)\\s+(\\d+)\\s*\\]\\s*$_moves\$',
 ); // e.g. "[1 3] f5f6f7"
+
+/// libedax takes these numbers as 32 bit integers.
+const int _maxNumber = 0x7FFFFFFF;
+
+/// The largest `book-randomness` of a game which libedax learns with other games.
+const int _maxRandomnessOfGames = 127;
 const int _fileRetryCount = 30;
 const Duration _fileRetryInterval = Duration(seconds: 1);
 
@@ -198,7 +204,9 @@ String? _gameLine(final String text) {
   match = _edaxVsEdaxWithRandomnessRegexp.firstMatch(text);
   if (match == null) return null;
   final randomness = int.tryParse(match.group(1)!);
-  if (randomness == null || randomness > 0x7FFFFFFF) return null;
+  // NOTE: `edax_book_store_games` doesn't learn a game with a larger randomness.
+  // Such a game is learned alone, as before.
+  if (randomness == null || randomness > _maxRandomnessOfGames) return null;
   return '$randomness,${match.group(2)!}';
 }
 
@@ -258,7 +266,9 @@ String? _learn(final LibEdax edax, final String text) {
   match = _edaxVsEdaxWithRandomnessRegexp.firstMatch(text);
   if (match != null) {
     final randomness = int.tryParse(match.group(1)!);
-    if (randomness == null) return 'too large number';
+    if (randomness == null || randomness > _maxNumber) {
+      return 'too large number';
+    }
     return _doEdaxVsEdaxWithRandomness(edax, match.group(2)!, randomness);
   }
 
@@ -266,7 +276,10 @@ String? _learn(final LibEdax edax, final String text) {
   if (match != null) {
     final relativeError = int.tryParse(match.group(1)!);
     final absoluteError = int.tryParse(match.group(2)!);
-    if (relativeError == null || absoluteError == null) {
+    if (relativeError == null ||
+        absoluteError == null ||
+        relativeError > _maxNumber ||
+        absoluteError > _maxNumber) {
       return 'too large number';
     }
     return _doEdaxBookDeviate(
@@ -339,6 +352,7 @@ void _deleteFilesLeftByKilledRun() {
   final leftByEdax = RegExp(r'^book\.dat(\.\w+)?\.tmp\.\d+$');
   final files = [
     File('$_learningListFile$_savingExt'),
+    File('$_bookFile$_savingExt'),
     ...Directory(_dataDir).listSync().whereType<File>().where(
       (final file) => leftByEdax.hasMatch(file.uri.pathSegments.last),
     ),
@@ -363,11 +377,22 @@ bool _play(final LibEdax edax, final String moves) {
   return played == moves.toLowerCase();
 }
 
+/// Save the book, or throw [FileSystemException] if it can't be saved.
 void _saveBook(final LibEdax edax) {
   _print('book save...');
-  // NOTE: edax replaces the book after saving to another file,
-  // so that it isn't broken even if edax_runner is killed while saving.
-  edax.edaxBookSave(_bookFile);
+  // NOTE: edax doesn't tell whether it has saved the book
+  // (e.g. it can't replace the book while another program opens it).
+  // So, let edax save to another file, check the file, and replace the book with it.
+  // The book isn't broken even if edax_runner is killed while saving.
+  final saving = File('$_bookFile$_savingExt');
+  _retry(() {
+    if (saving.existsSync()) saving.deleteSync();
+    edax.edaxBookSave(saving.path);
+    if (!saving.existsSync()) {
+      throw FileSystemException('edax could not save the book', saving.path);
+    }
+  });
+  _retry(() => saving.renameSync(_bookFile));
   _print('has finished book save.');
 }
 

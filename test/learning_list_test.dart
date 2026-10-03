@@ -199,6 +199,94 @@ void main() {
     });
   });
 
+  group('takeEntries, learning list edited while learning', () {
+    const texts = ['f5d6', '2,f5f6', 'f5d6'];
+    const learned = <String?>[null, null, null];
+
+    test('takes the same texts as many times as they have been learned', () {
+      final taken = takeEntries(
+        _bytes('f5d6\n2,f5f6\nf5d6\nf5d6\n2,f5f6\n'),
+        texts,
+        learned,
+      );
+      expect(_text(taken.log), 'f5d6\n2,f5f6\nf5d6\n');
+      expect(_text(taken.rest), 'f5d6\n2,f5f6\n');
+    });
+
+    test('takes only the texts if a line is inserted above them', () {
+      final taken = takeEntries(
+        _bytes('exit\n// a\nf5d6\n// b\n2,f5f6\nf5d6\nfix\n'),
+        texts,
+        learned,
+      );
+      expect(_text(taken.log), 'f5d6\n2,f5f6\nf5d6\n');
+      expect(_text(taken.rest), 'exit\n// a\n// b\nfix\n');
+    });
+
+    test('takes the texts around the lines inserted between them', () {
+      final taken = takeEntries(
+        _bytes(
+          '// a\nf5d6\nfix\n[1 2] f5f4\n\n// b\n2,f5f6\nexit\nf5d6\nf5f4\n',
+        ),
+        texts,
+        learned,
+      );
+      expect(_text(taken.log), '// a\nf5d6\n2,f5f6\nf5d6\n');
+      expect(_text(taken.rest), 'fix\n[1 2] f5f4\n\n// b\nexit\nf5f4\n');
+    });
+
+    test('takes the texts which are moved', () {
+      final taken = takeEntries(
+        _bytes('2,f5f6\r\nf5f4\r\nf5d6\r\n// a\r\nf5d6'),
+        texts,
+        [null, 'illegal move', null],
+      );
+      expect(
+        _text(taken.log),
+        'f5d6\r\n// [edax_runner] skipped (illegal move): 2,f5f6\r\nf5d6\n',
+      );
+      expect(_text(taken.rest), 'f5f4\r\n// a\r\n');
+    });
+
+    test('logs the texts which are removed', () {
+      final bytes = _bytes('// a\nf5f4\n');
+      final taken = takeEntries(bytes, texts, [null, 'illegal move', null]);
+      expect(
+        _text(taken.log),
+        'f5d6\n// [edax_runner] skipped (illegal move): 2,f5f6\nf5d6\n',
+      );
+      expect(taken.rest, bytes);
+    });
+
+    test('does not take a text in a comment or a part of another text', () {
+      final taken = takeEntries(
+        _bytes('// f5d6\nf5d6c3\n 2,f5f6 // x\n\tf5d6 \n'),
+        texts,
+        learned,
+      );
+      expect(_text(taken.log), '\tf5d6 \n2,f5f6\nf5d6\n');
+      expect(_text(taken.rest), '// f5d6\nf5d6c3\n 2,f5f6 // x\n');
+    });
+  });
+
+  test('keeps the bytes 0x85 and 0xA0 at the ends of a text', () {
+    // "あ" in Shift_JIS, and a line which ends with it
+    final bytes = Uint8List.fromList([
+      0x82,
+      0xA0,
+      0x0A,
+      0x66,
+      0x35,
+      0x82,
+      0xA0,
+    ]);
+    final entry = findEntry(bytes)!;
+    expect(entry.text.codeUnits, [0x82, 0xA0]);
+    final taken = takeEntry(bytes, entry.text, skipReason: 'unknown format');
+    expect(taken.log.sublist(taken.log.length - 3), [0x82, 0xA0, 0x0A]);
+    expect(taken.rest, [0x66, 0x35, 0x82, 0xA0]);
+  });
+
   test('isUtf16', () {
     expect(isUtf16(Uint8List.fromList([0xFF, 0xFE, 0x66, 0x00])), isTrue);
     expect(isUtf16(Uint8List.fromList([0xFE, 0xFF, 0x00, 0x66])), isTrue);

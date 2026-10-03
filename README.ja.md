@@ -68,7 +68,7 @@ start ./edax_runner.exe
   - `book deviate` については、[edax のドキュメント](https://sensuikan1973.github.io/edax-reversi/book_8c.html#ae9ee489a468274fd83808c53da0418c9)と [Choirokoitia のドキュメント](https://choi.lavox.net/edax/start)を見てください。
   - 空行は無視します。
   - 学習できない行（書式が違う、打てない手がある）は飛ばします。`learned_log.txt` には `// [edax_runner] skipped (illegal move): F5F5` のようなコメントとして記録します。
-  - edax_runner の実行中に `learning_list.txt` を書き換えてもかまいません。edax_runner は、1行の学習が終わるたびに読み直します。たとえば先頭に `exit` を足すと、いまの行の学習が終わったところで止まります。
+  - edax_runner の実行中に `learning_list.txt` を書き換えてもかまいません。edax_runner は、1行（同時に学習する棋譜は、その1組）の学習が終わるたびに読み直します。たとえば先頭に `exit` を足すと、いまの行（組）の学習が終わったところで止まります。
   - コメントの文字コードは、UTF-16 以外なら何でもかまいません。
 
 ## この fork で変えたこと
@@ -152,6 +152,8 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 - `[0 0]F5F6`、`[ 0 0 ] F5F6`、`2, F5F6` のような書き方も受け付けます。
 - `learning_list.txt` が作業フォルダにないときは、実行ファイルのあるフォルダを使います。
 - `learning_list.txt` の処理を速くし、メモリも少なくしました（バイト列のまま扱い、1行学習するごとに1回だけ読みます）。
+- `book.dat` を保存できないとき（ほかのプログラムが `book.dat` を開いている、など）は、1秒おきに30回まで保存をやり直します。それでも保存できなければ、`learning_list.txt` を変えずに止まります（5.3.0+nikque.3 から。それまでは、保存できていなくても学習済みとして行を消していました）。
+- edax_runner を強制終了しても、`book.dat`・`learning_list.txt`・`learned_log.txt` は壊れません。学習の途中だった行（同時に学習していた棋譜は、その1組）は、次に起動したときに最初から学習します。book を保存した直後（`learning_list.txt` を書き換える前）に止めた場合は、その行（組）をもう一度学習し、`learned_log.txt` に2回載ることがあります。
 
 ### 変更したファイル
 
