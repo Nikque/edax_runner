@@ -61,7 +61,10 @@ void main(final List<String> arguments) {
     ..edaxInit()
     ..edaxMode(3) // NOTE: edax must not move unless edax_runner tells.
     ..edaxEnableBookVerbose()
-    ..edaxPlayPrint();
+    ..edaxPlayPrint()
+    // NOTE: edax_runner saves the book by itself after each learning: libedax (since Edax 4.5.5 nikque.9)
+    // doesn't have to save the whole book to "book.dat.store" as well. (an older libedax ignores this)
+    ..edaxSetOption('book-store-auto-save', 'off');
 
   if (gamesLearner.tasks > 1) {
     _print('learn up to ${gamesLearner.tasks} games at the same time.');

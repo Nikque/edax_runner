@@ -13,6 +13,7 @@
   - 修正：`learning_list.txt` の行が、手の間の空白のために255バイトを超えると、短い手順として学習されることがありました。
   - 修正：起動時に読めなかった book ファイル（壊れている、ほかのプログラムが開いている）が、学習の後で上書きされていました。`book.dat.damaged` として残します。
   - 同時に行う探索のメモリが確保できないとき、終了せずに、同時に行う探索を減らして続けます。
+- 学習のたびに edax が book を `data/book.dat.store` に保存するのをやめました（Edax 4.5.5 nikque.9 の新しい設定 `book-store-auto-save` を、edax_runner が off にします）。直後に edax_runner が `book.dat` を保存するので、book 全体が2回書かれていました。`data/book.dat.store` は作られなくなります。
 
 - 修正：`book.dat` を保存できなかったとき（ほかのプログラムが `book.dat` を開いている、など）に、それに気づかず、学習した行を `learning_list.txt` から消していました。そのまま edax_runner が終わると、その学習は `book.dat` に残りませんでした。
   - book を別のファイル（`data/book.dat.saving`）に保存させ、保存できたことを確かめてから（libedax に足した、成否を返す関数 `edax_book_save_checked` と、ファイルの確認）`book.dat` と置き換えるようにしました。保存できないときは1秒おきに30回までやり直し、それでも保存できなければ、`learning_list.txt` を変えずに止まります。
