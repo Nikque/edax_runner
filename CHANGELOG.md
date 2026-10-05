@@ -7,6 +7,7 @@ The tag is `v5.3.0-nikque.3`.
   - fix: a line of `learning_list.txt` longer than 255 bytes because of spaces between its moves could be learned as a shorter game.
   - fix: a book file which couldn't be read at startup (damaged, or opened by another program) was overwritten after learning. Now it is kept as `book.dat.damaged`.
   - when the memory for the searches done at the same time isn't available, edax goes on with fewer searches instead of terminating.
+- learning many games at the same time is a little faster: the threads of the games that ended early are given to the games still played (128 games at level 18 with 32 threads: 33.6 seconds before, 30.3 seconds now, measured with Edax itself; same memory). The moves of the last games of a group can change from a run to the next.
 - edax doesn't save the book to `data/book.dat.store` after each learning any more (the new setting `book-store-auto-save` of Edax 4.5.5 nikque.9, which edax_runner turns off): edax_runner saves `book.dat` itself right after, so the whole book was written twice. `data/book.dat.store` is no longer created.
 
 - fix: a failure of saving `book.dat` (e.g. another program opens `book.dat`) wasn't noticed, and the learned lines were removed from `learning_list.txt`. If edax_runner ended after that, they weren't in `book.dat`.
