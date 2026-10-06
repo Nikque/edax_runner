@@ -4,6 +4,15 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。
 
+## 5.3.0+nikque.4
+
+タグは `v5.3.0-nikque.4` です。edax_runner 自身（Dart のコード）は変えていません。
+
+- libedax と `config.ini` を [Edax 4.5.5 nikque.10](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.10) のものにしました（詳しくは Edax の修正一覧）。
+  - `fix`（`book fix`）：大きな book で、Link の張り直しが速くなりました（6億6162万局面の book・32スレッドで 153.7秒 → 136.3秒。Edax 本体での計測）。できる book は同じです。
+  - `[relativeError absoluteError]`（`book deviate`）：level 18 以下で、1周の展開の対象が多いとき（`n-tasks` の32倍以上。32スレッドなら1,024件以上）は、1スレッドの探索を `n-tasks` 個同時に動かします（これまでは2スレッドの探索を半分の数）。649万局面の book・32スレッドで、60秒に展開できる件数が約1.25倍になりました（Edax 本体での計測）。**できる book は、これまでの `book-expand-tasks = auto` と少し違います**（Edax の README を参照）。対象の少ない周は変わりません。以前の決め方は、`config.ini` に `book-expand-tasks = 16`（`n-tasks` の半分）と書きます。
+  - libedax の修正：80手（着手＋パス）を超える対局で記録の外に書き込む、文字列の設定を設定し直すたびに前の文字列が解放されない、`edax_bench` の途中の `edax_stop` でベンチマークが終わらない。edax_runner の学習には影響しません。
+
 ## 5.3.0+nikque.3
 
 タグは `v5.3.0-nikque.3` です。

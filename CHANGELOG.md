@@ -1,3 +1,12 @@
+# 5.3.0+nikque.4
+
+The tag is `v5.3.0-nikque.4`. edax_runner itself (the Dart code) is unchanged.
+
+- libedax and `config.ini` of [Edax 4.5.5 nikque.10](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.10). (see its release notes)
+  - `fix` (`book fix`): the linking step is faster on a large book (a book of 661.62 million positions with 32 threads: 153.7 seconds before, 136.3 seconds now, measured with Edax itself). The book is the same.
+  - `[relativeError absoluteError]` (`book deviate`): up to level 18, a round with many positions to expand (at least 32 times `n-tasks`: 1,024 with 32 threads) runs `n-tasks` searches of one thread at the same time (it was half as many searches of 2 threads). With a book of 6.49 million positions and 32 threads, about 1.25 times as many positions are expanded in 60 seconds (measured with Edax itself). **The book differs a little from the one of `book-expand-tasks = auto` before** (see the README of Edax). Rounds with fewer positions are unchanged. For the previous rule, write `book-expand-tasks = 16` (half of `n-tasks`) in `config.ini`.
+  - fixes of libedax: a game of more than 80 plies (moves + passes) wrote outside its record, the previous string wasn't released when a string setting was set again, `edax_stop` during `edax_bench` didn't end the bench. They don't affect the learning of edax_runner.
+
 # 5.3.0+nikque.3
 
 The tag is `v5.3.0-nikque.3`.
