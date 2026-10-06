@@ -1,3 +1,10 @@
+# 5.3.0+nikque.6
+
+The tag is `v5.3.0-nikque.6`. edax_runner itself (the Dart code) is unchanged.
+
+- libedax of [Edax 4.5.5 nikque.12](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.12) (see its release notes). `config.ini` is the same.
+  - Edax 4.5.5 nikque.12 adds the commands `book leaf-recalculate` (searching the leaves of the book again), makes the commands that cut a book down (`book subtree`, `book prune`) faster, and accepts capitals in the word after `book`. **What edax_runner uses (learning games, `fix`, `[relativeError absoluteError]`) is unchanged.** This update keeps the libraries at the same version as Edax itself.
+
 # 5.3.0+nikque.5
 
 The tag is `v5.3.0-nikque.5`. edax_runner itself (the Dart code) is unchanged.

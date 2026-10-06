@@ -4,6 +4,13 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。
 
+## 5.3.0+nikque.6
+
+タグは `v5.3.0-nikque.6` です。edax_runner 自身（Dart のコード）は変えていません。
+
+- libedax を [Edax 4.5.5 nikque.12](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.12) のものにしました（詳しくは Edax の修正一覧）。`config.ini` は同じです。
+  - Edax 4.5.5 nikque.12 で変わったのは、新しい命令 `book leaf-recalculate`（Leaf の評価値の計算し直し）、book を切り詰める命令（`book subtree`・`book prune`）の速さ、`book` の後ろの語の大文字・小文字です。**edax_runner が使う機能（棋譜の学習、`fix`、`[relativeError absoluteError]`）の処理は変わっていません。** Edax 本体とライブラリの版をそろえるための更新です。
+
 ## 5.3.0+nikque.5
 
 タグは `v5.3.0-nikque.5` です。edax_runner 自身（Dart のコード）は変えていません。

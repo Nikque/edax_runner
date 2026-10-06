@@ -170,6 +170,7 @@ Other changes:
 
 | edax_runner | Edax | |
 | :-- | :-- | :-- |
+| [5.3.0+nikque.6](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.6) | [4.5.5 nikque.12](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.12) | libedax update only (what edax_runner uses is unchanged) |
 | [5.3.0+nikque.5](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.5) | [4.5.5 nikque.11](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.11) | libedax update only (what edax_runner uses is unchanged) |
 | [5.3.0+nikque.4](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.4) | [4.5.5 nikque.10](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.10) | faster `fix` on a large book, faster expansion of `[relativeError absoluteError]` (rounds with many positions; the book differs a little) |
 | [5.3.0+nikque.3](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.3) | [4.5.5 nikque.9](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.9) | bug fixes found by a final audit (a book that wasn't saved is noticed, the search with several threads, long lines, a book file that can't be read) |
