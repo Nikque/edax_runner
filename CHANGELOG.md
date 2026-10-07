@@ -1,3 +1,14 @@
+# 5.3.0+nikque.7
+
+The tag is `v5.3.0-nikque.7`.
+
+- Fix: **a line of more than 80 plies (moves + passes) was skipped as an "illegal move".** It only happens with 21 passes or more (such a game exists from the usual initial position: 60 moves and 22 passes = 82 plies), so a usual learning list is not concerned.
+  - Games learned at the same time (`book-store-tasks` is `auto`, or 2 or more): the game record inside libedax still had 80 entries (fixed in Edax 4.5.5 nikque.13).
+  - Games learned one by one (`book-store-tasks = 1`, lines with `[relativeError absoluteError]`): after playing the moves of the line, edax_runner read the moves back from libedax and compared them with the line, but only 80 plies can be read back. The line is now accepted when the moves read back are the beginning of the line and the board has 4 discs plus one for each move of the line. Nothing changes for a line of 80 plies or less.
+- libedax and `config.ini` of [Edax 4.5.5 nikque.13](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.13) (see its release notes).
+  - Edax 4.5.5 nikque.13 fixes the bugs found by an audit of the changes of Edax 4.5.5 nikque.10 to 12. In what edax_runner uses (learning games, `fix`, `[relativeError absoluteError]`), the changes are the 80 plies above and the fix of a rare crash in the search of a position without a move (a pass; the search results don't change). **The books are the same as with 5.3.0+nikque.6** (except `[relativeError absoluteError]` with `hash-table-size` set to 19 or less: see the README of Edax).
+  - `config.ini` has the comment and the line of the new setting of Edax, `book-leaf-recalculate-rounds` (edax_runner doesn't use it).
+
 # 5.3.0+nikque.6
 
 The tag is `v5.3.0-nikque.6`. edax_runner itself (the Dart code) is unchanged.

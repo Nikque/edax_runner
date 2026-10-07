@@ -4,6 +4,17 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。
 
+## 5.3.0+nikque.7
+
+タグは `v5.3.0-nikque.7` です。
+
+- 修正：**80手（着手＋パス）を超える行を、「illegal move」として飛ばしていました。** パスが21回以上ある対局でだけ起きます（通常の初期局面からでも、着手60＋パス22＝82手の対局があります）。ふつうの学習リストでは当たりません。
+  - 棋譜を同時に学習する場合（`book-store-tasks` が `auto` か2以上）：libedax の中の対局の記録が80手ぶんのままでした（Edax 4.5.5 nikque.13 で修正）。
+  - 1局ずつ学習する場合（`book-store-tasks = 1`、`[relativeError absoluteError]` 付きの行）：edax_runner は、行の手を打たせた後で、libedax から手順を読み戻して行と比べていましたが、読み戻せるのは80手までです。読み戻した手順が行の先頭と一致し、盤上の石の数が「4＋行の手の数」なら、全部の手が打てたと判断するようにしました。80手以下の行の判定は変わりません。
+- libedax と `config.ini` を [Edax 4.5.5 nikque.13](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.13) のものにしました（詳しくは Edax の修正一覧）。
+  - Edax 4.5.5 nikque.13 は、Edax 4.5.5 nikque.10〜12 の変更を点検して見つかった不具合の修正です。edax_runner が使う機能（棋譜の学習、`fix`、`[relativeError absoluteError]`）で変わるのは、上の80手の件と、合法手のない局面（パスの局面）の探索でまれに異常終了する不具合の修正（探索の結果は変わりません）です。**できる book は 5.3.0+nikque.6 と同じです**（`hash-table-size` を19以下の数にしている場合の `[relativeError absoluteError]` を除きます。Edax の README を参照）。
+  - `config.ini` に、Edax の新しい設定 `book-leaf-recalculate-rounds` の説明と行が増えました（edax_runner は使いません）。
+
 ## 5.3.0+nikque.6
 
 タグは `v5.3.0-nikque.6` です。edax_runner 自身（Dart のコード）は変えていません。

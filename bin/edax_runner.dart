@@ -442,7 +442,15 @@ bool _play(final LibEdax edax, final String moves) {
     ..edaxPlay(moves);
   final played = edax.edaxGetMoves().toLowerCase().replaceAll('pa', '');
   edax.edaxPlayPrint();
-  return played == moves.toLowerCase();
+  final line = moves.toLowerCase();
+  if (played == line) return true;
+  // NOTE: `edax_get_moves` gives the first 80 plies (moves and passes) only,
+  // so the moves of a game with more than 20 passes cannot all be read back.
+  // Each move puts one disc on the board, and what follows an illegal move isn't played:
+  // such a line is legal if every move of [moves] has put its disc.
+  final discs =
+      edax.edaxGetDisc(TurnColor.black) + edax.edaxGetDisc(TurnColor.white);
+  return line.startsWith(played) && discs == 4 + line.length ~/ 2;
 }
 
 /// Save the book, or throw [FileSystemException] if it can't be saved.
