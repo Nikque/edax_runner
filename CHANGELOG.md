@@ -9,6 +9,10 @@ The tag is `v5.3.0-nikque.9`.
   - A damaged book file is not loaded (it was loaded, and could crash later).
   - On a correct book, learning, `fix` and `[relativeError absoluteError]` make the same book.
 
+
+- **Post-release checks (2026-10-15)**: the same 5.3.0+nikque.9 executable with nikque.14/15 DLLs, five identical lists, with 1 thread / one game at a time and 4 threads / auto (10 pairs). Every exit code was 0; remaining lists and learned logs matched byte for byte in every pair. Canonical books matched in all six pairs using 30 games, error limits or an empty list. Two of four pairs using the bundled list or its BOM/CRLF form matched; two differed. Repeating the BOM/CRLF list three times with the same new DLL also changed the book (292/292/290 positions). Exact book equality was not established for lists with random-play lines; the cause of those differences was not fully isolated from version changes.
+- In test-only copies of the learned-line removal function, an edit was injected after reading the list and writing the saving file: the old code lost the added line; the new code reread the list, kept it and wrote one learned-log entry. No test hook was added to distributed source or binaries.
+
 # 5.3.0+nikque.8
 
 The tag is `v5.3.0-nikque.8`. edax_runner itself (the Dart code) is unchanged.
