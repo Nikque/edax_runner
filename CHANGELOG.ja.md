@@ -4,6 +4,14 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。
 
+## 5.3.0+nikque.8
+
+タグは `v5.3.0-nikque.8` です。edax_runner そのもの（Dart のコード）は変わりません。
+
+- libedax と `config.ini` を [Edax 4.5.5 nikque.14](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.14) のものにしました（変更点は Edax の修正一覧にあります）。
+  - Edax 4.5.5 nikque.14 で変わったのは、book の新しい命令 `book fill2`・`book leaf expand`、`book fill` の範囲の指定、`book leaf-recalculate` から `book leaf recalculate` への名前の変更です。**edax_runner が使う機能（棋譜の学習、`fix`、`[relativeError absoluteError]`）の処理は変わっていません。** Edax 本体とライブラリの版をそろえるための更新です。
+  - `config.ini`：`book-leaf-recalculate-rounds` の説明の文を、新しい命令の名前 `book leaf recalculate` にしました（設定は同じです）。
+
 ## 5.3.0+nikque.7
 
 タグは `v5.3.0-nikque.7` です。

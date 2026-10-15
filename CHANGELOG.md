@@ -1,3 +1,11 @@
+# 5.3.0+nikque.8
+
+The tag is `v5.3.0-nikque.8`. edax_runner itself (the Dart code) is unchanged.
+
+- libedax and `config.ini` of [Edax 4.5.5 nikque.14](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.14) (see its release notes).
+  - Edax 4.5.5 nikque.14 adds the book commands `book fill2` and `book leaf expand`, a range for `book fill`, and renames `book leaf-recalculate` to `book leaf recalculate`. **What edax_runner uses (learning games, `fix`, `[relativeError absoluteError]`) is unchanged**: this update keeps the libraries at the same version as Edax itself.
+  - `config.ini`: the comment of `book-leaf-recalculate-rounds` names the new command `book leaf recalculate` (the settings are the same).
+
 # 5.3.0+nikque.7
 
 The tag is `v5.3.0-nikque.7`.
