@@ -1,3 +1,14 @@
+# 5.3.0+nikque.9
+
+The tag is `v5.3.0-nikque.9`.
+
+- Fix: **an edit of the learning list saved by the user while edax_runner took the learned lines out of it could be lost** (from the original edax_runner). Just before the list is replaced, its size and time of change are compared with the ones when it was read; if they changed, it is read again (5 times at most).
+- libedax of [Edax 4.5.5 nikque.15](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.15) (see its release notes). For edax_runner:
+  - When learning keeps adding positions to a large book, the memory no longer used (the former places in the pool of the loaded book) is released between the learning steps.
+  - The unused part of the pool is released on Linux and macOS too.
+  - A damaged book file is not loaded (it was loaded, and could crash later).
+  - On a correct book, learning, `fix` and `[relativeError absoluteError]` make the same book.
+
 # 5.3.0+nikque.8
 
 The tag is `v5.3.0-nikque.8`. edax_runner itself (the Dart code) is unchanged.

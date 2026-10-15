@@ -4,6 +4,17 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。
 
+## 5.3.0+nikque.9
+
+タグは `v5.3.0-nikque.9` です。
+
+- 修正：**学習リストから学習済みの行を抜いている間に、利用者が保存した学習リストの編集が消えることがあった**（元の edax_runner から）。置き換える直前に、学習リストの大きさと更新時刻が読んだときと同じかを見て、違えば読み直してやり直します（5 回まで）。
+- libedax を [Edax 4.5.5 nikque.15](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.15) のものにしました（変更点は Edax の修正一覧にあります）。edax_runner に関係するのは次のとおりです。
+  - 大きな book に学習で局面を足し続けたときに、使われなくなったメモリ（読み込んだ book のプールの元の場所）を、学習の合間に放します。
+  - Linux・macOS でも、使わないプールの部分を放します。
+  - 壊れた book のファイルは読み込みません（これまでは読み込み、使うと異常終了することがありました）。
+  - 正しい book での学習・`fix`・`[relativeError absoluteError]` でできる book は同じです。
+
 ## 5.3.0+nikque.8
 
 タグは `v5.3.0-nikque.8` です。edax_runner そのもの（Dart のコード）は変わりません。
