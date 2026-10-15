@@ -386,18 +386,30 @@ Uint8List _removeLearnedTexts(
   final List<String> texts,
   final List<String?> skipReasons,
 ) {
-  final taken = takeEntries(_readLearningList(), texts, skipReasons);
-  _retry(
-    () => File(
-      _learnedLogFile,
-    ).writeAsBytesSync(taken.log, mode: FileMode.append, flush: true),
-  );
-  // NOTE: don't overwrite learning list directly,
-  // so that it isn't broken even if edax_runner is killed while saving.
-  final saving = File('$_learningListFile$_savingExt');
-  _retry(() => saving.writeAsBytesSync(taken.rest, flush: true));
-  _retry(() => saving.renameSync(_learningListFile));
-  return taken.rest;
+  for (var attempt = 1; ; attempt++) {
+    final stamp = _learningListStamp();
+    final taken = takeEntries(_readLearningList(), texts, skipReasons);
+    // NOTE: don't overwrite learning list directly,
+    // so that it isn't broken even if edax_runner is killed while saving.
+    final saving = File('$_learningListFile$_savingExt');
+    _retry(() => saving.writeAsBytesSync(taken.rest, flush: true));
+    // NOTE: learning list may have been saved by the user since it was read:
+    // then it is read again, so that the edit isn't lost (a few times at most).
+    if (attempt < 5 && _learningListStamp() != stamp) continue;
+    _retry(
+      () => File(
+        _learnedLogFile,
+      ).writeAsBytesSync(taken.log, mode: FileMode.append, flush: true),
+    );
+    _retry(() => saving.renameSync(_learningListFile));
+    return taken.rest;
+  }
+}
+
+/// Size and time of the last change of learning list, to tell whether it was saved since it was read.
+String _learningListStamp() {
+  final stat = _retry(() => File(_learningListFile).statSync());
+  return '${stat.size} ${stat.modified.microsecondsSinceEpoch}';
 }
 
 /// Retry [action] for a while,
