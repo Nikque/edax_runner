@@ -196,12 +196,22 @@ class _NikqueLibEdax {
     } on ArgumentError {
       // NOTE: the same.
     }
+    try {
+      _keepUnread = library
+          .lookupFunction<
+            Int32 Function(Pointer<Utf8>),
+            int Function(Pointer<Utf8>)
+          >('edax_book_keep_unread_file');
+    } on ArgumentError {
+      // NOTE: libedax of Edax 4.5.5 nikque.15 and before doesn't have this function.
+    }
   }
 
   int Function()? _storeTasks;
   int Function(Pointer<Utf8>, Pointer<Utf8>)? _storeGames;
   int Function(Pointer<Utf8>)? _saveTo;
   int Function()? _failed;
+  int Function(Pointer<Utf8>)? _keepUnread;
 
   /// The number of games to learn at the same time. (`book-store-tasks`)
   int get tasks => _storeGames == null ? 1 : (_storeTasks?.call() ?? 1);
@@ -241,6 +251,21 @@ class _NikqueLibEdax {
         'edax could not add a position to the book (not enough memory?).'
         ' "$_learningListFile" and "$_bookFile" are not changed.',
       );
+    }
+  }
+
+  /// Before [path] (the book file of `-book-file`) is replaced: if it could not be loaded,
+  /// keep it as `<path>.damaged` (`edax_book_keep_unread_file`, since Edax 4.5.5 nikque.16).
+  /// Return false if it could not be loaded and could not be kept: it must not be replaced.
+  /// Return true with an older libedax (it doesn't tell it).
+  bool keepUnreadBook(final String path) {
+    final keepUnread = _keepUnread;
+    if (keepUnread == null) return true;
+    final file = path.toNativeUtf8();
+    try {
+      return keepUnread(file) != 0;
+    } finally {
+      calloc.free(file);
     }
   }
 
@@ -480,6 +505,16 @@ void _saveBook(final LibEdax edax) {
     if (saved == null) edax.edaxBookSave(saving.path);
     if (saved == false || !saving.existsSync()) {
       throw FileSystemException('edax could not save the book', saving.path);
+    }
+  });
+  // NOTE: libedax keeps a book file that it could not load (damaged, truncated) when the book is saved
+  // to that file; here the book is saved to another file, so ask libedax to keep it before the rename.
+  _retry(() {
+    if (!_nikque.keepUnreadBook(_bookFile)) {
+      throw FileSystemException(
+        'the book file could not be loaded, and could not be kept as .damaged',
+        _bookFile,
+      );
     }
   });
   _retry(() => saving.renameSync(_bookFile));
