@@ -153,6 +153,8 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 - `learning_list.txt` が作業フォルダにないときは、実行ファイルのあるフォルダを使います。
 - `learning_list.txt` の処理を速くし、メモリも少なくしました（バイト列のまま扱い、1行学習するごとに1回だけ読みます）。
 - `book.dat` を保存できないとき（ほかのプログラムが `book.dat` を開いている、など）は、1秒おきに30回まで保存をやり直します。それでも保存できなければ、`learning_list.txt` を変えずに止まります（5.3.0+nikque.3 から。それまでは、保存できていなくても学習済みとして行を消していました）。
+- 起動のときに `book.dat` を読めなかった（壊れている・途中で切れている）ときは、学習した book で置き換える前に `data/book.dat.damaged` として残します。残せなければ、`learning_list.txt` を変えずに止まります（5.3.0+nikque.10 から。Edax 4.5.5 nikque.16 以降の libedax で）。
+- 同じフォルダーで 2 つ目の edax_runner を起動すると、何もせずに止まります（動いている間、フォルダーの `edax_runner.lock` をつかみます。5.3.0+nikque.10 から）。
 - edax_runner を強制終了しても、`book.dat`・`learning_list.txt`・`learned_log.txt` は壊れません。学習の途中だった行（同時に学習していた棋譜は、その1組）は、次に起動したときに最初から学習します。book を保存した直後（`learning_list.txt` を書き換える前）に止めた場合は、その行（組）をもう一度学習し、`learned_log.txt` に2回載ることがあります。
 
 ### 変更したファイル
@@ -170,7 +172,8 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 
 | edax_runner | Edax | |
 | :-- | :-- | :-- |
-| [5.3.0+nikque.9](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.9) | [4.5.5 nikque.15](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.15) | 学習リストの編集が消えることがあった不具合の修正、学習中のメモリ（Edax の修正）
+| [5.3.0+nikque.10](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.10) | [4.5.5 nikque.18](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.18) | 読めなかった book のファイルが置き換えられていた不具合の修正、同じフォルダーの 2 つ目の edax_runner は止まる |
+| [5.3.0+nikque.9](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.9) | [4.5.5 nikque.15](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.15) | 学習リストの編集が消えることがあった不具合の修正、学習中のメモリ（Edax の修正） |
 | [5.3.0+nikque.8](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.8) | [4.5.5 nikque.14](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.14) | libedax の更新だけ（edax_runner が使う機能の処理は同じ） |
 | [5.3.0+nikque.7](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.7) | [4.5.5 nikque.13](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.13) | 80手を超える行を学習できるように（Edax の点検で見つかった不具合の修正） |
 | [5.3.0+nikque.6](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.6) | [4.5.5 nikque.12](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.12) | libedax の更新だけ（edax_runner が使う機能の処理は同じ） |

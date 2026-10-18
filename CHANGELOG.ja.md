@@ -4,6 +4,25 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。
 
+## 5.3.0+nikque.10
+
+タグは `v5.3.0-nikque.10` です。
+
+- 修正：**起動のときに読めなかった `data/book.dat`（壊れている・途中で切れている）が、何もない状態から学習した book で置き換えられていた**（5.3.0+nikque.3 から。book を `data/book.dat.saving` に保存してから `data/book.dat` へ名前を変えるため）。名前を変える前に、`data/book.dat.damaged` として残します（libedax の関数 `edax_book_keep_unread_file`、Edax 4.5.5 nikque.16 から）。残せないときは `book.dat` を置き換えず、`learning_list.txt` を変えずに止まります。
+- **同じフォルダーで 2 つ目の edax_runner を起動すると、何もせずに止まります**（終了コード 1）。同じフォルダーで 2 つ動かすと、同じ行を同じ book に学習し、互いに保存した book を置き換えていました。edax_runner は、動いている間、フォルダーの `edax_runner.lock` というファイルをつかみます。edax_runner が終わると（強制終了でも）、OS が放します（ファイルはフォルダーに残ります）。
+- libedax と `config.ini` を [Edax 4.5.5 nikque.18](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.18) のものにしました（nikque.16・17 の変更を含みます。変更点は Edax の修正一覧にあります）。edax_runner に関係するのは次のとおりです。
+  - nikque.16：2回目のクロスチェックで見つかった不具合の修正（壊れた棋譜のファイルや盤面を受け付けない、など）、関数 `edax_book_keep_unread_file`（上）。
+  - nikque.17：設定 `book-seed`・`book-reproducible`（`config.ini` にあります。既定の動作は変わりません）。
+  - nikque.18：ライブラリに、ビルドしたときのフォルダーが入りません（エラーの文言はファイル名だけ）。
+- 以前の Release の Windows の ZIP も、同梱のライブラリのビルドしたときのフォルダーを同じように消しました（ほかは変えていません）。
+
+確認（Windows、1〜2論理CPU）：
+
+- 途中で切れた `data/book.dat`（100,000バイト）と、学習する 1 行：5.3.0+nikque.9 は置き換えました（終了 0、`.damaged` なし）。この版は `data/book.dat.damaged`（同じバイト列）として残し、学習した book を保存しました。
+- 1 つ目が同じフォルダーで 24 行を学習している間に 2 つ目を起動：この版では 2 つ目が 0.2 秒で止まり（終了 1）、1 つ目が 24 行を学習。直す前は両方が学習しました（`learned_log.txt` が 35 行）。1 つ目が終わった後も、強制終了の後も、次の起動は学習しました。
+- 5.3.0+nikque.9 と同じ 5 種類のリストを、level 6、1スレッド・1局ずつと 2スレッド・`book-store-tasks = auto` で、公開の 5.3.0+nikque.9 と比較：終了コードはすべて 0、10 組中 9 組で book・`learning_list.txt`・`learned_log.txt` が同じ。残る 1 組（`book-randomness` 4 の行を含むリスト）は、どちらの版も 3 回の実行で同じ 3 通りの book になりました（その行の乱数による選択）。
+- `dart format`、`dart analyze --fatal-infos --fatal-warnings`、`dart test`（27件）。
+
 ## 5.3.0+nikque.9
 
 タグは `v5.3.0-nikque.9` です。

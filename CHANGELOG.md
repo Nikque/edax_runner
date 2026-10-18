@@ -1,3 +1,22 @@
+# 5.3.0+nikque.10
+
+The tag is `v5.3.0-nikque.10`.
+
+- Fix: **a `data/book.dat` that could not be read at startup (damaged, truncated) was replaced by the book learned from nothing** (since 5.3.0+nikque.3, which saves the book to `data/book.dat.saving` and renames it to `data/book.dat`). It is now kept as `data/book.dat.damaged` before the rename (`edax_book_keep_unread_file`, a function of libedax since Edax 4.5.5 nikque.16). If it cannot be kept, `book.dat` is not replaced, and edax_runner stops without changing `learning_list.txt`.
+- **A second edax_runner started in the same folder stops without doing anything** (exit code 1). Two edax_runner in one folder learned the same lines into the same book file and replaced the book saved by each other. edax_runner locks the file `edax_runner.lock` of the folder while it runs; the system releases the lock when edax_runner ends, also when it is killed (the file is left in the folder).
+- libedax and `config.ini` of [Edax 4.5.5 nikque.18](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.18) (with the changes of nikque.16 and 17; see its release notes). For edax_runner:
+  - nikque.16: the fixes of a second cross-check (damaged game files and boards are refused, and others), the function `edax_book_keep_unread_file` (above).
+  - nikque.17: the settings `book-seed` and `book-reproducible` (in `config.ini`; the default behaviour is unchanged).
+  - nikque.18: the libraries no longer hold the folder where they were built (an error message shows the file name only).
+- The Windows ZIPs of the earlier releases: the build folders in the bundled libraries were removed in the same way (nothing else changes).
+
+Checks (Windows, one or two logical CPUs):
+
+- A truncated `data/book.dat` (100,000 bytes) and one line to learn: 5.3.0+nikque.9 replaced it (exit 0, no `.damaged`); this version keeps it as `data/book.dat.damaged` (the same bytes) and saves the learned book.
+- A second edax_runner started while the first learns 24 lines in the same folder: with the change, it stops in 0.2 seconds (exit 1) and the first one learns the 24 lines; without it, both learned (35 lines in `learned_log.txt`). After the first one ended, and after it was killed, the next one starts and learns.
+- The same five lists as for 5.3.0+nikque.9, at level 6, with 1 thread / one game at a time and 2 threads / `book-store-tasks = auto`, against 5.3.0+nikque.9 as published: every exit code 0, the same books, `learning_list.txt` and `learned_log.txt` in 9 of 10 pairs. In the 10th (a list with a line of `book-randomness` 4), three runs of each version gave the same three books (the random choice of the line).
+- `dart format`, `dart analyze --fatal-infos --fatal-warnings`, `dart test` (27 tests).
+
 # 5.3.0+nikque.9
 
 The tag is `v5.3.0-nikque.9`.

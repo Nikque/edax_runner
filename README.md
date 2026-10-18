@@ -153,6 +153,8 @@ Other changes:
 - The directory of the executable is used if `learning_list.txt` isn't in the current directory.
 - `learning_list.txt` is handled faster with less memory (it's handled as bytes, and read once per line to learn).
 - If `book.dat` can't be saved (e.g. another program opens `book.dat`), saving is retried every second, up to 30 times. If it still can't be saved, edax_runner stops without changing `learning_list.txt`. (since 5.3.0+nikque.3; before, the lines were removed as learned even if the book wasn't saved)
+- If `book.dat` could not be read at startup (damaged, truncated), it is kept as `data/book.dat.damaged` before the learned book replaces it. If it cannot be kept, edax_runner stops without changing `learning_list.txt`. (since 5.3.0+nikque.10, with libedax of Edax 4.5.5 nikque.16 or later)
+- A second edax_runner started in the same folder stops without doing anything (it locks `edax_runner.lock` of the folder while it runs). (since 5.3.0+nikque.10)
 - `book.dat`, `learning_list.txt` and `learned_log.txt` aren't broken even if edax_runner is killed. The line being learned (or the group of games being learned at the same time) is learned from the beginning at the next run. If edax_runner is killed right after saving the book (before rewriting `learning_list.txt`), the line (or group) is learned once more, and can be recorded twice in `learned_log.txt`.
 
 ### Where the changes are
@@ -170,7 +172,8 @@ Other changes:
 
 | edax_runner | Edax | |
 | :-- | :-- | :-- |
-| [5.3.0+nikque.9](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.9) | [4.5.5 nikque.15](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.15) | fix: an edit of the learning list could be lost; memory while learning (Edax fixes)
+| [5.3.0+nikque.10](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.10) | [4.5.5 nikque.18](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.18) | fix: a book file that could not be read was replaced; a second edax_runner in the same folder stops |
+| [5.3.0+nikque.9](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.9) | [4.5.5 nikque.15](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.15) | fix: an edit of the learning list could be lost; memory while learning (Edax fixes) |
 | [5.3.0+nikque.8](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.8) | [4.5.5 nikque.14](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.14) | libedax update only (what edax_runner uses is unchanged) |
 | [5.3.0+nikque.7](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.7) | [4.5.5 nikque.13](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.13) | a line of more than 80 plies is learned (fixes found by an audit of Edax) |
 | [5.3.0+nikque.6](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.6) | [4.5.5 nikque.12](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.12) | libedax update only (what edax_runner uses is unchanged) |
