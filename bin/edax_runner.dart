@@ -13,6 +13,7 @@ const String _learnedLogFile = 'learned_log.txt';
 const String _configFile = 'config.ini';
 const String _oldConfigFile = 'edax.ini';
 const String _savingExt = '.saving';
+const String _lockFile = 'edax_runner.lock';
 const String _moves = '((?:[a-hA-H][1-8])+)';
 final _edaxVsEdaxRegexp = RegExp(
   '^(?:(\\d+)\\s*,\\s*)?$_moves\$',
@@ -33,6 +34,17 @@ const Duration _fileRetryInterval = Duration(seconds: 1);
 void main(final List<String> arguments) {
   _print('launching edax_runner...');
   _useExecutableDirectoryIfNeeded();
+  // NOTE: two edax_runner in the same folder would learn the same lines into the same book file
+  // and replace the book saved by each other.
+  _folderLock = _lockFolder();
+  if (_folderLock == null) {
+    _print(
+      'another edax_runner is running in "${Directory.current.path}":'
+      ' this one stops without doing anything.',
+    );
+    exitCode = 1;
+    return;
+  }
   if (!File(_learningListFile).existsSync()) {
     _print('"$_learningListFile" is not found in "${Directory.current.path}".');
     exitCode = 1;
@@ -448,6 +460,22 @@ T _retry<T>(final T Function() action) {
       if (count == 1) _print('WARNING: retrying... ($e)');
       sleep(_fileRetryInterval);
     }
+  }
+}
+
+/// The lock of [_lockFile], held while edax_runner runs.
+RandomAccessFile? _folderLock;
+
+/// Lock [_lockFile] of the current folder for this run, or return null if another process holds it.
+/// The system releases the lock when the process ends, also when it is killed.
+RandomAccessFile? _lockFolder() {
+  final file = File(_lockFile).openSync(mode: FileMode.append);
+  try {
+    file.lockSync(FileLock.exclusive, 0, 1);
+    return file;
+  } on FileSystemException {
+    file.closeSync();
+    return null;
   }
 }
 
