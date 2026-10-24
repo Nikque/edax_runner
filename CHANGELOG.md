@@ -1,3 +1,20 @@
+# 5.3.0+nikque.11
+
+The tag is `v5.3.0-nikque.11`.
+
+- libedax of [Edax 4.5.5 nikque.22](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.22) (with the changes of nikque.19 to 21; see its release notes). The functions that edax_runner uses and what they do, `config.ini` and `eval.dat` are those of nikque.18.
+  - nikque.19 to 22 add text commands of Edax (the book analyses, `book findline`, `book reduce` and `book reducecount` with the settings `book-reduce-*`), which edax_runner does not use. The new settings have their default values without a line in `config.ini`.
+  - The search and the books are the same as with nikque.18 (the checks of Edax: the results, node counts and lines of fforum-20-39, 204 API checks of the libraries).
+  - The libraries: the 3 Windows DLLs are 1,024 to 1,536 bytes larger, the 3 Linux ones 98,336 to 110,656 bytes, the macOS one 165,120 bytes (the code of the analysis commands).
+
+Checks (Windows, one or two logical CPUs):
+
+- The same five lists as for 5.3.0+nikque.10, at level 6, with 1 thread / one game at a time and 2 threads / `book-store-tasks = auto`, against 5.3.0+nikque.10 as published, with the same executable and `config.ini` and the DLLs of this version: every exit code 0, the same books, `learning_list.txt` and `learned_log.txt` in 9 of 10 pairs. In the 10th (a list with a line of `book-randomness` 4), with `book-seed` set to 1 to 6, the books are the same for the 6 seeds (and for another list with the same line).
+- A truncated `data/book.dat` and one line to learn: it is kept as `data/book.dat.damaged` (the same bytes) and the learned book is saved. A second edax_runner stops in 0.2 seconds (exit 1) and the first one learns 24 lines. After the first one ended, and after it was killed, the next one starts and learns.
+- The 7 bundled libraries are those of Edax 4.5.5 nikque.22 byte for byte and hold no build folder.
+- `dart format`, `dart analyze --fatal-infos --fatal-warnings`, `dart test` (27 tests).
+- The speed and the memory were not measured. Not tried on Linux and macOS.
+
 # 5.3.0+nikque.10
 
 The tag is `v5.3.0-nikque.10`.

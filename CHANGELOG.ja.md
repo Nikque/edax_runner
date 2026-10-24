@@ -4,6 +4,23 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。
 
+## 5.3.0+nikque.11
+
+タグは `v5.3.0-nikque.11` です。
+
+- libedax を [Edax 4.5.5 nikque.22](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.22) のものにしました（nikque.19〜22 の変更を含みます。変更点は Edax の修正一覧にあります）。edax_runner が使う関数とその働き、`config.ini`・`eval.dat` は nikque.18 と同じです。
+  - nikque.19〜22 で足されたのは Edax の文字の命令（book の解析の命令、`book findline`、`book reduce`・`book reducecount` と設定 `book-reduce-*`）で、edax_runner は使いません。新しい設定は `config.ini` に書かなくても既定の値で動きます。
+  - 探索と book の結果は nikque.18 と同じです（Edax の確認：fforum-20-39 の結果・ノード数・読み筋、ライブラリの API 試験 204 項目）。
+  - ライブラリの大きさ：Windows の DLL 3 つは +1,024〜+1,536 バイト、Linux の 3 つは +98,336〜+110,656 バイト、macOS は +165,120 バイト（解析の命令のコードの分）。
+
+確認（Windows、1〜2論理CPU）：
+
+- 5.3.0+nikque.10 と同じ 5 種類のリストを、level 6、1スレッド・1局ずつと 2スレッド・`book-store-tasks = auto` で、公開の 5.3.0+nikque.10 と、同じ実行ファイル・`config.ini` にこの版の DLL を入れたものとで比較：終了コードはすべて 0、10 組中 9 組で book・`learning_list.txt`・`learned_log.txt` が同じ。残る 1 組（`book-randomness` 4 の行を含むリスト）は、`book-seed` を 1〜6 に固めると、6 通りとも book が同じでした（同じ行を含むもう 1 つのリストも 6 通りとも同じ）。
+- 途中で切れた `data/book.dat` と学習する 1 行：`data/book.dat.damaged`（同じバイト列）として残し、学習した book を保存しました。2 つ目の edax_runner は 0.2 秒で止まり（終了 1）、1 つ目が 24 行を学習。1 つ目が終わった後も、強制終了の後も、次の起動は学習しました。
+- 同梱のライブラリ 7 つは Edax 4.5.5 nikque.22 の配布物と同じバイト列で、ビルドしたときのフォルダーは入っていません。
+- `dart format`、`dart analyze --fatal-infos --fatal-warnings`、`dart test`（27件）。
+- 速さとメモリは測っていません。Linux・macOS の実機では試していません。
+
 ## 5.3.0+nikque.10
 
 タグは `v5.3.0-nikque.10` です。
