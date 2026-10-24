@@ -106,7 +106,7 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 
 どれを使っているかは、`[edax_runner] use "libedax-x64-v4.dll".` のように表示します。
 
-**このライブラリをほかのソフトで使う場合**：ライブラリは edax_runner 専用ではありません。libedax 用に書かれたプログラム（[libedax4dart](https://pub.dev/packages/libedax4dart) を使うもの、C・Python・C# などから `libedax.h` の関数を呼ぶもの）なら、ライブラリと `data/eval.dat` をプログラムと同じフォルダに置けば使えます。ヘッダー（`src/libedax.h`）、短い使用例（`tests/libedax_example.c`）、元の libedax との違い、Android 用のライブラリについては、[Edax 4.5.5 (nikque) の README](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/README-NIKQUE.ja.md)の「libedax：Edaxをライブラリとして使う」を見てください。ライブラリは、その [Releases](https://github.com/Nikque/edax-reversi-AVX/releases) の ZIP にも入っています。
+**このライブラリをほかのソフトで使う場合**：ライブラリは edax_runner 専用ではありません。libedax 用に書かれたプログラム（[libedax4dart](https://pub.dev/packages/libedax4dart) を使うもの、C・Python・C# などから `libedax.h` の関数を呼ぶもの）なら、ライブラリと `data/eval.dat` をプログラムと同じフォルダに置けば使えます。ヘッダー（`src/libedax.h`）、短い使用例（`tests/libedax_example.c`）、元の libedax との違い、Android 用のライブラリについては、[Edax 4.5.5 (nikque) のマニュアル 12.2「ライブラリ（libedax）」](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/ja/12-integration.md)を見てください。ライブラリは、その [Releases](https://github.com/Nikque/edax-reversi-AVX/releases) の ZIP にも入っています。
 
 ### 3. 設定は config.ini
 
@@ -129,7 +129,7 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
   | edax_runner を8本同時（`n-tasks = 4`）＋ book の merge | 42秒＋2秒 |
   | edax_runner を16本同時（`n-tasks = 2`）＋ book の merge | 35秒＋3秒 |
 
-- できる book は、`book-store-tasks = 1` で学習した book とまったく同じにはなりません。違いの大きさと実測の詳細は、[Edax 4.5.5 (nikque) の README](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/README-NIKQUE.ja.md) を見てください。
+- できる book は、`book-store-tasks = 1` で学習した book とまったく同じにはなりません。違いの大きさは [Edax 4.5.5 (nikque) のマニュアル 7.2「棋譜の学習を同時に行う：book-store-tasks」](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/ja/07-book-learning.md)に、実測の詳細は [Edax のテストと実測の記録（nikque.7）](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/docs/validation/nikque.ja.md#v455-nikque7)にあります。
 - 同じ組の棋譜は、その組を始める前の book を使って対局します。1局ごとの手順は表示しません。
 - `book deviate`、`fix`、1行だけの「Edax 対 Edax」は、1つずつ学習します（1局だけの場合も、その局面の探索は同時に行います。level 18 で1局ずつ30局の学習は18秒で、`book-store-tasks = 1` では35秒でした。edax に同じコマンドを入力して測った値です）。
 - それでも edax_runner を何本も同時に起動する場合は、合計のスレッド数が CPU の数を超えないように `n-tasks` を設定してください。
@@ -157,17 +157,6 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 - 同じフォルダーで 2 つ目の edax_runner を起動すると、何もせずに止まります（動いている間、フォルダーの `edax_runner.lock` をつかみます。5.3.0+nikque.10 から）。
 - edax_runner を強制終了しても、`book.dat`・`learning_list.txt`・`learned_log.txt` は壊れません。学習の途中だった行（同時に学習していた棋譜は、その1組）は、次に起動したときに最初から学習します。book を保存した直後（`learning_list.txt` を書き換える前）に止めた場合は、その行（組）をもう一度学習し、`learned_log.txt` に2回載ることがあります。
 
-### 変更したファイル
-
-| ファイル | 変更 |
-| :-- | :-- |
-| `bin/edax_runner.dart` | ライブラリの選択、`config.ini`、複数の棋譜の同時学習、上の修正 |
-| `lib/learning_list.dart`（新規） | `learning_list.txt` をバイト列のまま読み書きする処理 |
-| `test/learning_list_test.dart`（新規） | その試験 |
-| `resources/dll/` | Edax 4.5.5 (nikque) の libedax：Windows 3個、Linux 3個、Mac 1個 |
-| `resources/config.ini`（新規）、`resources/edax.ini`（削除） | 設定 |
-| `scripts/build_edax_runner.sh`、`.github/workflows/` | OS ごとのライブラリを全部同梱する。Release は手動で作る（`Create Release`） |
-
 ### 版
 
 | edax_runner | Edax | |
@@ -183,6 +172,17 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 | [5.3.0+nikque.3](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.3) | [4.5.5 nikque.9](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.9) | 総点検で見つかった不具合の修正（book を保存できなかったことに気づく、複数スレッドの探索、長い行、読めなかった book ファイル） |
 | [5.3.0+nikque.2](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.2) | [4.5.5 nikque.8](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.8) | 探索する局面が少ないときや level が高いときに速く（level 24 の1局：26秒 → 6〜11秒） |
 | [5.3.0+nikque.1](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.1) | [4.5.5 nikque.7](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.7) | この fork の最初の版 |
+
+### ソースの変更（開発者向け）
+
+| ファイル | 変更 |
+| :-- | :-- |
+| `bin/edax_runner.dart` | ライブラリの選択、`config.ini`、複数の棋譜の同時学習、上の修正 |
+| `lib/learning_list.dart`（新規） | `learning_list.txt` をバイト列のまま読み書きする処理 |
+| `test/learning_list_test.dart`（新規） | そのテスト |
+| `resources/dll/` | Edax 4.5.5 (nikque) の libedax：Windows 3個、Linux 3個、Mac 1個 |
+| `resources/config.ini`（新規）、`resources/edax.ini`（削除） | 設定 |
+| `scripts/build_edax_runner.sh`、`.github/workflows/` | OS ごとのライブラリを全部同梱する。Release は手動で作る（`Create Release`） |
 
 ## 参考
 

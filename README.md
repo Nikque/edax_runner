@@ -106,7 +106,7 @@ libedax is built for several levels of CPU, and edax_runner uses the fastest one
 
 edax_runner prints the one which it uses, like `[edax_runner] use "libedax-x64-v4.dll".`
 
-**Using these libraries in another program**: they are not tied to edax_runner. Any program written for libedax (with [libedax4dart](https://pub.dev/packages/libedax4dart), or calling the functions of `libedax.h` from C, Python, C#, ...) can use them: put the library and `data/eval.dat` next to the program. The header (`src/libedax.h`), a short example (`tests/libedax_example.c`), the differences from the original libedax and the libraries for Android are in [the README of Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/README-NIKQUE.en.md) ("libedax: Edax as a library"); the libraries are also in the ZIP of its [Releases](https://github.com/Nikque/edax-reversi-AVX/releases).
+**Using these libraries in another program**: they are not tied to edax_runner. Any program written for libedax (with [libedax4dart](https://pub.dev/packages/libedax4dart), or calling the functions of `libedax.h` from C, Python, C#, ...) can use them: put the library and `data/eval.dat` next to the program. The header (`src/libedax.h`), a short example (`tests/libedax_example.c`), the differences from the original libedax and the libraries for Android are in [section 12.2 "The library (libedax)" of the Edax 4.5.5 (nikque) manual](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/en/12-integration.md); the libraries are also in the ZIP of its [Releases](https://github.com/Nikque/edax-reversi-AVX/releases).
 
 ### 3. Settings in config.ini
 
@@ -129,7 +129,7 @@ Several games are learned at the same time, with `book-store-tasks` of `config.i
   | 8 edax_runner at the same time, `n-tasks = 4`, then merging their books | 42 + 2 seconds |
   | 16 edax_runner at the same time, `n-tasks = 2`, then merging their books | 35 + 3 seconds |
 
-- The book is not exactly the same as the one learned with `book-store-tasks = 1`: see [the README of Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/README-NIKQUE.en.md) for how much it differs, and for the measurements.
+- The book is not exactly the same as the one learned with `book-store-tasks = 1`: how much it differs is in [section 7.2 of the Edax 4.5.5 (nikque) manual](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/en/07-book-learning.md) ("Learning several games in parallel: book-store-tasks"), and the measurements are in [the Edax test records (nikque.7)](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/docs/validation/nikque.en.md#v455-nikque7).
 - The games of a group are played with the book as it was before the group, and the moves of each game aren't printed.
 - `book deviate`, `fix` and a single line of edax vs edax are learned one by one. (the positions of a single game are still searched at the same time: 30 single games at level 18 took 18 seconds, against 35 seconds with `book-store-tasks = 1`, with the same commands typed in edax)
 - If you still run several edax_runner at the same time, set `n-tasks` so that they don't use more threads than your CPU has.
@@ -157,17 +157,6 @@ Other changes:
 - A second edax_runner started in the same folder stops without doing anything (it locks `edax_runner.lock` of the folder while it runs). (since 5.3.0+nikque.10)
 - `book.dat`, `learning_list.txt` and `learned_log.txt` aren't broken even if edax_runner is killed. The line being learned (or the group of games being learned at the same time) is learned from the beginning at the next run. If edax_runner is killed right after saving the book (before rewriting `learning_list.txt`), the line (or group) is learned once more, and can be recorded twice in `learned_log.txt`.
 
-### Where the changes are
-
-| file | change |
-| :-- | :-- |
-| `bin/edax_runner.dart` | choice of the library, `config.ini`, learning several games at the same time, the fixes above |
-| `lib/learning_list.dart` (new) | reading and rewriting `learning_list.txt` as bytes |
-| `test/learning_list_test.dart` (new) | tests of the above |
-| `resources/dll/` | libedax of Edax 4.5.5 (nikque): 3 for Windows, 3 for Linux, 1 for Mac |
-| `resources/config.ini` (new), `resources/edax.ini` (removed) | settings |
-| `scripts/build_edax_runner.sh`, `.github/workflows/` | the libraries of each OS are bundled; the release is created by hand (`Create Release`) |
-
 ### Versions
 
 | edax_runner | Edax | |
@@ -183,6 +172,17 @@ Other changes:
 | [5.3.0+nikque.3](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.3) | [4.5.5 nikque.9](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.9) | bug fixes found by a final audit (a book that wasn't saved is noticed, the search with several threads, long lines, a book file that can't be read) |
 | [5.3.0+nikque.2](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.2) | [4.5.5 nikque.8](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.8) | faster when few positions are searched or at a high level (a single game at level 24: 26 seconds before, 6 to 11 seconds now) |
 | [5.3.0+nikque.1](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.1) | [4.5.5 nikque.7](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.7) | the first version of this fork |
+
+### Where the changes are (for developers)
+
+| file | change |
+| :-- | :-- |
+| `bin/edax_runner.dart` | choice of the library, `config.ini`, learning several games at the same time, the fixes above |
+| `lib/learning_list.dart` (new) | reading and rewriting `learning_list.txt` as bytes |
+| `test/learning_list_test.dart` (new) | tests of the above |
+| `resources/dll/` | libedax of Edax 4.5.5 (nikque): 3 for Windows, 3 for Linux, 1 for Mac |
+| `resources/config.ini` (new), `resources/edax.ini` (removed) | settings |
+| `scripts/build_edax_runner.sh`, `.github/workflows/` | the libraries of each OS are bundled; the release is created by hand (`Create Release`) |
 
 ## References
 
