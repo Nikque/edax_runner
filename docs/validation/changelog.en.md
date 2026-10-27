@@ -4,6 +4,21 @@
 
 The tests and measurements done for the versions of this fork, moved unchanged from [CHANGELOG.md](../../CHANGELOG.md). What changed in each version is in [CHANGELOG.md](../../CHANGELOG.md).
 
+## 5.3.0+nikque.12
+
+- The search and the books are the same as with nikque.22 (the checks of Edax: the results, node counts and lines of fforum-20-39, 204 API checks of the libraries).
+- The libraries: the 3 Windows DLLs are 512 bytes larger, the 3 Linux ones 8,192 bytes, the macOS one has the same size (not the same bytes).
+
+Checks (Windows, one or two logical CPUs):
+
+- The same five lists as for 5.3.0+nikque.11, at level 6, with 1 thread / one game at a time and 2 threads / `book-store-tasks = auto`, against 5.3.0+nikque.11 as published, with the same executable and `config.ini` and the DLLs of this version: every exit code 0, the same books, `learning_list.txt` and `learned_log.txt` in 8 of 10 pairs; `learning_list.txt` and `learned_log.txt` are the same in all 10.
+  - With 1 thread, the list `base` (with a line of `book-randomness` 4): with `book-seed` set to 1 to 6, the books of both are the same for the 6 seeds.
+  - With 2 threads, the list of 30 games: 5.3.0+nikque.11 as published gave 3 books in 3 runs by itself, and the books still varied with `book-seed` fixed (the order of the 2 games learned at once); both gave some of the same books. With 1 thread, the books of this list are the same.
+- A truncated `data/book.dat` and one line to learn: it is kept as `data/book.dat.damaged` (the same bytes) and the learned book is saved. A second edax_runner stops in 0.2 seconds (exit 1) and the first one learns 24 lines. After the first one ended, and after it was killed, the next one starts and learns.
+- The 7 bundled libraries are those of Edax 4.5.5 nikque.23 byte for byte and hold no build folder.
+- `dart format`, `dart analyze --fatal-infos --fatal-warnings`, `dart test` (27 tests).
+- The speed and the memory were not measured. Not tried on Linux and macOS.
+
 ## 5.3.0+nikque.11
 
 - The search and the books are the same as with nikque.18 (the checks of Edax: the results, node counts and lines of fforum-20-39, 204 API checks of the libraries).

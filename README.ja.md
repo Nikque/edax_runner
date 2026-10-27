@@ -161,6 +161,7 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 
 | edax_runner | Edax | |
 | :-- | :-- | :-- |
+| [5.3.0+nikque.12](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.12) | [4.5.5 nikque.23](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.23) | libedax の更新だけ（edax_runner が使う機能の処理は同じ） |
 | [5.3.0+nikque.11](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.11) | [4.5.5 nikque.22](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.22) | libedax の更新だけ（edax_runner が使う機能の処理は同じ） |
 | [5.3.0+nikque.10](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.10) | [4.5.5 nikque.18](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.18) | 読めなかった book のファイルが置き換えられていた不具合の修正、同じフォルダーの 2 つ目の edax_runner は止まる |
 | [5.3.0+nikque.9](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.9) | [4.5.5 nikque.15](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.15) | 学習リストの編集が消えることがあった不具合の修正、学習中のメモリ（Edax の修正） |

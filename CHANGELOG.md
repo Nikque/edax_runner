@@ -4,6 +4,27 @@
 
 Versions of this fork. The history of the original edax_runner (5.3.0 and earlier) follows below. The tests and measurements are in [docs/validation/changelog.en.md](docs/validation/changelog.en.md).
 
+## 5.3.0+nikque.12
+
+This version updates the bundled libedax to Edax 4.5.5 nikque.23. What edax_runner does and the books it learns are unchanged. Tag `v5.3.0-nikque.12`; libedax: [Edax 4.5.5 nikque.23](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.23).
+
+**Changes**
+
+- libedax is now that of Edax 4.5.5 nikque.23 (Edax release notes: [nikque.23](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.md#v455-nikque23)).
+- nikque.23 changes the text command `book moveinfo` of Edax (its precision stages are taken over from the answers of the positions before and after) and the warning after a book command typed without `book` (it adds a hint). edax_runner does not use them.
+- Documents: this changelog was rewritten and the test and measurement records moved to `docs/validation/`. The first comment lines of `config.ini` point to chapter 4 of the Edax manual (the settings are the same).
+
+**Compatibility**
+
+- The libedax functions that edax_runner uses and what they do, and `eval.dat`, are the same as in nikque.22 (5.3.0+nikque.11). The settings of `config.ini` are the same too (only its first comment lines differ).
+- The search and the books are the same as with nikque.22.
+
+**Not checked**: speed and memory; running on real Linux and macOS machines.
+
+[Tests and measurements](docs/validation/changelog.en.md#530nikque12)
+
+---
+
 ## 5.3.0+nikque.11
 
 This version updates the bundled libedax to Edax 4.5.5 nikque.22. What edax_runner does and the books it learns are unchanged. Tag `v5.3.0-nikque.11`; libedax: [Edax 4.5.5 nikque.22](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.22).

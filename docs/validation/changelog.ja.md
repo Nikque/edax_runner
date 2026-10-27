@@ -4,6 +4,21 @@
 
 この fork の各版で行ったテストと実測の記録です。[CHANGELOG.ja.md](../../CHANGELOG.ja.md) から、そのまま移しました。各版で何が変わったかは [CHANGELOG.ja.md](../../CHANGELOG.ja.md) にあります。
 
+## 5.3.0+nikque.12
+
+- 探索と book の結果は nikque.22 と同じです（Edax の確認：fforum-20-39 の結果・ノード数・読み筋、ライブラリの API 試験 204 項目）。
+- ライブラリの大きさ：Windows の DLL 3 つは +512 バイト、Linux の 3 つは +8,192 バイト、macOS は同じ大きさ（中身は違います）。
+
+確認（Windows、1〜2論理CPU）：
+
+- 5.3.0+nikque.11 と同じ 5 種類のリストを、level 6、1スレッド・1局ずつと 2スレッド・`book-store-tasks = auto` で、公開の 5.3.0+nikque.11 と、同じ実行ファイル・`config.ini` にこの版の DLL を入れたものとで比較：終了コードはすべて 0、10 組中 8 組で book・`learning_list.txt`・`learned_log.txt` が同じ。`learning_list.txt`・`learned_log.txt` は 10 組とも同じ。
+  - 1スレッドの `base`（`book-randomness` 4 の行を含むリスト）は、`book-seed` を 1〜6 に固めると、6 通りとも新旧の book が同じでした。
+  - 2スレッドの棋譜 30 件のリストは、公開の 5.3.0+nikque.11 だけでも 3 回の実行で 3 通りの book になり、`book-seed` を固めても揺れました（同時に学習する 2 局の順による）。新旧で同じ book も出ました。同じリストの 1スレッドでは新旧の book が同じでした。
+- 途中で切れた `data/book.dat` と学習する 1 行：`data/book.dat.damaged`（同じバイト列）として残し、学習した book を保存しました。2 つ目の edax_runner は 0.2 秒で止まり（終了 1）、1 つ目が 24 行を学習。1 つ目が終わった後も、強制終了の後も、次の起動は学習しました。
+- 同梱のライブラリ 7 つは Edax 4.5.5 nikque.23 の配布物と同じバイト列で、ビルドしたときのフォルダーは入っていません。
+- `dart format`、`dart analyze --fatal-infos --fatal-warnings`、`dart test`（27件）。
+- 速さとメモリは測っていません。Linux・macOS の実機では試していません。
+
 ## 5.3.0+nikque.11
 
 - 探索と book の結果は nikque.18 と同じです（Edax の確認：fforum-20-39 の結果・ノード数・読み筋、ライブラリの API 試験 204 項目）。

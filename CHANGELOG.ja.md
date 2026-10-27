@@ -4,6 +4,27 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。テストと実測の記録は [docs/validation/changelog.ja.md](docs/validation/changelog.ja.md) にあります。
 
+## 5.3.0+nikque.12
+
+同梱の libedax を Edax 4.5.5 nikque.23 に更新した版です。edax_runner の動作と学習の結果は変わりません。タグは `v5.3.0-nikque.12`、libedax：[Edax 4.5.5 nikque.23](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.23)。
+
+**変更**
+
+- libedax を Edax 4.5.5 nikque.23 のものにしました（Edax の修正一覧：[nikque.23](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque23)）。
+- nikque.23 で変わったのは、Edax のテキストのコマンド `book moveinfo`（精度の段階を前後の局面の答えから引き継ぐ）と、book のコマンドを `book` なしで打ったときの警告の案内です。edax_runner はこれらを使いません。
+- 文書：この変更履歴を書き直し、テストと実測の記録を `docs/validation/` へ移しました。`config.ini` の初めの説明の行は、Edax の手引きの 4 章を指します（設定は同じです）。
+
+**互換性**
+
+- edax_runner が使う libedax の関数とその働き、`eval.dat` は nikque.22（5.3.0+nikque.11）と同じです。`config.ini` の設定も同じです（違うのは初めの説明の行だけです）。
+- 探索と book の結果は nikque.22 と同じです。
+
+**未確認**：速さとメモリ、Linux・macOS の実機での動作。
+
+[検証記録](docs/validation/changelog.ja.md#530nikque12)
+
+---
+
 ## 5.3.0+nikque.11
 
 同梱の libedax を Edax 4.5.5 nikque.22 に更新した版です。edax_runner の動作と学習の結果は変わりません。タグは `v5.3.0-nikque.11`、libedax：[Edax 4.5.5 nikque.22](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.22)。
