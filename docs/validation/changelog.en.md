@@ -4,6 +4,12 @@
 
 The tests and measurements done for the versions of this fork, moved unchanged from [CHANGELOG.md](../../CHANGELOG.md). What changed in each version is in [CHANGELOG.md](../../CHANGELOG.md).
 
+## 5.3.0+nikque.13
+
+- The seven libraries match the published nikque.25 ZIP. No build source paths were found. Windows DLL and macOS library sizes are unchanged; the Linux libraries grew by 4,096 bytes each.
+- On Windows, Dart format and analysis passed and 27 tests passed. With the published 5.3.0+nikque.12 executable and configuration, all 10 old/new comparisons exited 0 and had identical learning lists and logs. Seven books matched. For two single-thread lists with random choices, all six fixed seeds produced identical canonical books. For a two-thread game list, scheduling can affect the learned book; in three runs per version with seed 1, the six canonical books matched.
+- A truncated book was preserved, concurrent second startup was rejected, and startup after normal and forced termination succeeded. The comparison used small test data and at most two CPUs.
+- Linux and macOS execution, speed and memory were not tested.
 ## 5.3.0+nikque.12
 
 - The search and the books are the same as with nikque.22 (the checks of Edax: the results, node counts and lines of fforum-20-39, 204 API checks of the libraries).

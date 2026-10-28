@@ -4,6 +4,11 @@
 
 Versions of this fork. The history of the original edax_runner (5.3.0 and earlier) follows below. The tests and measurements are in [docs/validation/changelog.en.md](docs/validation/changelog.en.md).
 
+## 5.3.0+nikque.13
+
+Updates the bundled libedax to Edax 4.5.5 nikque.25. Between nikque.23 and nikque.25, the changed engine source is the book analysis implementation. The libedax API and runner source are unchanged. See [validation](docs/validation/changelog.en.md#530nikque13).
+
+---
 ## 5.3.0+nikque.12
 
 This version updates the bundled libedax to Edax 4.5.5 nikque.23. What edax_runner does and the books it learns are unchanged. Tag `v5.3.0-nikque.12`; libedax: [Edax 4.5.5 nikque.23](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.23).

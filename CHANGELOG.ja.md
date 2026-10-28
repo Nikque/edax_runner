@@ -4,6 +4,11 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。テストと実測の記録は [docs/validation/changelog.ja.md](docs/validation/changelog.ja.md) にあります。
 
+## 5.3.0+nikque.13
+
+同梱の libedax を Edax 4.5.5 nikque.25 に更新しました。nikque.23 から 25 の間で変わったエンジンのソースは book 解析の実装です。libedax の API と runner のソースは変更していません。[検証記録](docs/validation/changelog.ja.md#530nikque13)
+
+---
 ## 5.3.0+nikque.12
 
 同梱の libedax を Edax 4.5.5 nikque.23 に更新した版です。edax_runner の動作と学習の結果は変わりません。タグは `v5.3.0-nikque.12`、libedax：[Edax 4.5.5 nikque.23](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.23)。
