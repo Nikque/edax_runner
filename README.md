@@ -94,7 +94,7 @@ The way to use it and the format of `learning_list.txt` are the same.
 
 ### 2. A library for each level of CPU
 
-`resources/dll/` (and the Release archives) hold the libedax of [Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX): **all the 93 functions of the original libedax are available**, with the same names, arguments and data layout, and 5 more (`edax_book_deviate2`, `edax_book_deviate3`, `edax_book_store_games`, `edax_book_store_tasks`, `libedax_cpu_level`). edax_runner itself only uses a few of them.
+`resources/dll/` (and the Release archives) hold the libedax of [Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX): **all the 93 functions of the original libedax are available**, with the same names, arguments and data layout, and functions of its own, such as `edax_book_deviate2`, `edax_book_deviate3`, `edax_book_store_games`, `edax_book_store_tasks`, `libedax_cpu_level` and, since Edax 4.5.5 nikque.26 (5.3.0+nikque.14), `edax_book_deviate_export` (it writes the lines that `book deviate`, `deviate2` or `deviate3` walks to a text file, without expanding the book). The added functions are listed in [chapter 12 of the Edax manual](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/en/12-integration.md). edax_runner itself only uses a few of them.
 
 libedax is built for several levels of CPU, and edax_runner uses the fastest one which your CPU can run. (Windows, Linux; on Mac, `libedax.universal.dylib` is for Apple silicon and Intel)
 

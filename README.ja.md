@@ -94,7 +94,7 @@ start ./edax_runner.exe
 
 ### 2. CPU に合わせたライブラリ
 
-`resources/dll/`（と Release の ZIP）に入っているのは、[Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX) の libedax です。**元の libedax の93個の関数がすべて使えます**（名前・引数・データの並びも同じ）。さらに5個の関数（`edax_book_deviate2`、`edax_book_deviate3`、`edax_book_store_games`、`edax_book_store_tasks`、`libedax_cpu_level`）を追加しています。edax_runner 自身が使うのは、そのうちの一部だけです。
+`resources/dll/`（と Release の ZIP）に入っているのは、[Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX) の libedax です。**元の libedax の93個の関数がすべて使えます**（名前・引数・データの並びも同じ）。さらに、`edax_book_deviate2`・`edax_book_deviate3`・`edax_book_store_games`・`edax_book_store_tasks`・`libedax_cpu_level` などの関数を追加しています。Edax 4.5.5 nikque.26（5.3.0+nikque.14）からは `edax_book_deviate_export`（`book deviate`・`deviate2`・`deviate3` がたどる進行を、book を広げずにテキストファイルに書き出す）も使えます。追加した関数の一覧は [Edax の説明書の 12 章](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/ja/12-integration.md) にあります。edax_runner 自身が使うのは、そのうちの一部だけです。
 
 libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お使いの CPU が動かせる中で最も速いものを使います（Windows と Linux。Mac の `libedax.universal.dylib` は、Apple silicon と Intel の両用です）。
 
