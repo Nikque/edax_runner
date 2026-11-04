@@ -4,6 +4,24 @@
 
 Versions of this fork. The history of the original edax_runner (5.3.0 and earlier) follows below. The tests and measurements are in [docs/validation/changelog.en.md](docs/validation/changelog.en.md).
 
+## 5.3.0+nikque.14
+
+Updates the bundled libedax to Edax 4.5.5 nikque.26, so that its new function `edax_book_deviate_export` can be used. Tag `v5.3.0-nikque.14`; libedax: [Edax 4.5.5 nikque.26](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.26).
+
+**Changes**
+
+- libedax is now that of Edax 4.5.5 nikque.26 (Edax release notes: [nikque.26](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.md#v455-nikque26)).
+- nikque.26 adds `export <file> [leaf|ends|all]` to the text commands `book deviate`, `book deviate2` and `book deviate3` of Edax, and the libedax function `edax_book_deviate_export(base, x, y, file, which)`: it writes the lines those commands walk from the current position to a text file, without expanding the book. edax_runner does not use them.
+
+**Compatibility**
+
+- The libedax functions that edax_runner uses and what they do, `eval.dat` and the settings of `config.ini` are the same as in nikque.25 (5.3.0+nikque.13). The runner source is unchanged.
+
+**Not checked**: speed and memory; running on real Linux and macOS machines.
+
+[Tests and measurements](docs/validation/changelog.en.md#530nikque14)
+
+---
 ## 5.3.0+nikque.13
 
 Updates the bundled libedax to Edax 4.5.5 nikque.25. Between nikque.23 and nikque.25, the changed engine source is the book analysis implementation. The libedax API and runner source are unchanged. See [validation](docs/validation/changelog.en.md#530nikque13).

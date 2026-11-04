@@ -161,6 +161,7 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 
 | edax_runner | Edax | |
 | :-- | :-- | :-- |
+| [5.3.0+nikque.14](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.14) | [4.5.5 nikque.26](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.26) | libedax の更新（新しい関数 `edax_book_deviate_export`） |
 | [5.3.0+nikque.13](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.13) | [4.5.5 nikque.25](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.25) | libedax の更新 |
 | [5.3.0+nikque.12](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.12) | [4.5.5 nikque.23](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.23) | libedax の更新だけ（edax_runner が使う機能の処理は同じ） |
 | [5.3.0+nikque.11](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.11) | [4.5.5 nikque.22](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.22) | libedax の更新だけ（edax_runner が使う機能の処理は同じ） |

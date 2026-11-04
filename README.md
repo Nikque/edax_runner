@@ -161,6 +161,7 @@ Other changes:
 
 | edax_runner | Edax | |
 | :-- | :-- | :-- |
+| [5.3.0+nikque.14](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.14) | [4.5.5 nikque.26](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.26) | libedax update (the new function `edax_book_deviate_export`) |
 | [5.3.0+nikque.13](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.13) | [4.5.5 nikque.25](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.25) | libedax update |
 | [5.3.0+nikque.12](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.12) | [4.5.5 nikque.23](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.23) | libedax update only (what edax_runner uses is unchanged) |
 | [5.3.0+nikque.11](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.11) | [4.5.5 nikque.22](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.22) | libedax update only (what edax_runner uses is unchanged) |

@@ -4,6 +4,13 @@
 
 The tests and measurements done for the versions of this fork, moved unchanged from [CHANGELOG.md](../../CHANGELOG.md). What changed in each version is in [CHANGELOG.md](../../CHANGELOG.md).
 
+## 5.3.0+nikque.14
+
+- The seven libraries match the published nikque.26 ZIP (taken again after the release and checked against its SHA256SUMS). No build folder names were found. Sizes: the Windows DLLs +17,920 to +19,456 bytes, the Linux libraries +8,192 to +12,288 bytes, the macOS library +33,024 bytes (the code of the export).
+- On Windows (logical CPUs 16 to 19), Dart format and analysis passed and 27 tests passed. With the published 5.3.0+nikque.13 executable and configuration, all 10 old/new comparisons exited 0 and had identical learning lists and logs; nine books matched. The tenth (the BOM/CRLF list with a line of `book-randomness` 4, one thread) differs by the random choice: with `book-seed` fixed to 1 to 6, the canonical books of old and new matched for all six seeds, and for the list `base` too (12 pairs).
+- A truncated book was kept as `data/book.dat.damaged` (the same bytes) and the learned book saved; a concurrent second startup was rejected (exit 1) while the first learned 24 lines; startup after normal and forced termination succeeded. Small test data and at most two logical CPUs.
+- Linux and macOS execution, speed and memory were not tested. `edax_book_deviate_export` itself was tested in the API checks of Edax (218 checks of the libraries), not through edax_runner.
+
 ## 5.3.0+nikque.13
 
 - The seven libraries match the published nikque.25 ZIP. No build source paths were found. Windows DLL and macOS library sizes are unchanged; the Linux libraries grew by 4,096 bytes each.

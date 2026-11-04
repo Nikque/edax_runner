@@ -4,6 +4,24 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。テストと実測の記録は [docs/validation/changelog.ja.md](docs/validation/changelog.ja.md) にあります。
 
+## 5.3.0+nikque.14
+
+同梱の libedax を Edax 4.5.5 nikque.26 に更新しました。新しい関数 `edax_book_deviate_export` を使えるようにするための版です。タグは `v5.3.0-nikque.14`、libedax：[Edax 4.5.5 nikque.26](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.26)。
+
+**変更**
+
+- libedax を Edax 4.5.5 nikque.26 のものにしました（Edax の変更点：[nikque.26](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque26)）。
+- nikque.26 は、Edax の文字の命令 `book deviate`・`book deviate2`・`book deviate3` に `export <file> [leaf|ends|all]` を足し、libedax に関数 `edax_book_deviate_export(base, x, y, file, which)` を足しました。今の局面からこれらの命令がたどる進行を、book を広げずにテキストファイルに書き出します。edax_runner はこれらを使いません。
+
+**互換性**
+
+- edax_runner が使う libedax の関数とその動き、`eval.dat`、`config.ini` の設定は nikque.25（5.3.0+nikque.13）と同じです。runner のソースは変えていません。
+
+**未確認**：速さとメモリ、Linux・macOS の実機での実行。
+
+[検証記録](docs/validation/changelog.ja.md#530nikque14)
+
+---
 ## 5.3.0+nikque.13
 
 同梱の libedax を Edax 4.5.5 nikque.25 に更新しました。nikque.23 から 25 の間で変わったエンジンのソースは book 解析の実装です。libedax の API と runner のソースは変更していません。[検証記録](docs/validation/changelog.ja.md#530nikque13)
