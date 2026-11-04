@@ -12,6 +12,7 @@
 
 - libedax を Edax 4.5.5 nikque.26 のものにしました（Edax の変更点：[nikque.26](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque26)）。
 - nikque.26 は、Edax の文字の命令 `book deviate`・`book deviate2`・`book deviate3` に `export <file> [leaf|ends|all]` を足し、libedax に関数 `edax_book_deviate_export(base, x, y, file, which)` を足しました。今の局面からこれらの命令がたどる進行を、book を広げずにテキストファイルに書き出します。edax_runner はこれらを使いません。
+- CI：macOS のジョブを `macos-15` で動かすようにしました（`macos-latest` では機械が割り当てられませんでした）。macOS の ZIP の名前は同じです。
 
 **互換性**
 

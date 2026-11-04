@@ -12,6 +12,7 @@ Updates the bundled libedax to Edax 4.5.5 nikque.26, so that its new function `e
 
 - libedax is now that of Edax 4.5.5 nikque.26 (Edax release notes: [nikque.26](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.md#v455-nikque26)).
 - nikque.26 adds `export <file> [leaf|ends|all]` to the text commands `book deviate`, `book deviate2` and `book deviate3` of Edax, and the libedax function `edax_book_deviate_export(base, x, y, file, which)`: it writes the lines those commands walk from the current position to a text file, without expanding the book. edax_runner does not use them.
+- CI: the macOS jobs run on `macos-15` (on `macos-latest` they were not given a machine). The name of the macOS ZIP is the same.
 
 **Compatibility**
 

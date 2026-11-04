@@ -26,7 +26,7 @@ jobs:
             libedax_shared_library_pattern: "libedax-x64*.dll"
           - os: macos-latest # apple silicon
             # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
-            runner_machine: macos-latest
+            runner_machine: macos-15 # (macos-latest kept the jobs waiting; the ZIP name keeps "macos-latest")
             edax_runner_bin_name: edax_runner
             libedax_shared_library_pattern: libedax.universal.dylib
 
