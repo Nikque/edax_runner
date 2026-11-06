@@ -120,6 +120,16 @@ void main() {
       expect(taken.rest, bytes);
     });
 
+    test('logs the skipped text which is removed while learning', () {
+      final bytes = _bytes('// a\r\nf5f6\r\n');
+      final taken = takeEntry(bytes, 'f5d6', skipReason: 'illegal move');
+      expect(
+        _text(taken.log),
+        '// [edax_runner] skipped (illegal move): f5d6\n',
+      );
+      expect(taken.rest, bytes);
+    });
+
     test('logs the skipped text as a comment', () {
       final taken = takeEntry(
         _bytes('// a\r\nf5f5\r\nfix\r\n'),
