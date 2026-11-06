@@ -62,8 +62,7 @@ void main(final List<String> arguments) {
 
   var learningList = _readLearningList();
   final libraryPath = _edaxSharedLibraryPath();
-  // NOTE: with `book-store-tasks` of `config.ini`, libedax learns several games at the same time.
-  final gamesLearner = _nikque = _NikqueLibEdax(libraryPath);
+  _nikque = _NikqueLibEdax(libraryPath);
   final edax = LibEdax(libraryPath)
     ..libedaxInitialize([
       '',
@@ -78,12 +77,13 @@ void main(final List<String> arguments) {
     // doesn't have to save the whole book to "book.dat.store" as well. (an older libedax ignores this)
     ..edaxSetOption('book-store-auto-save', 'off');
 
-  if (gamesLearner.tasks > 1) {
-    _print('learn up to ${gamesLearner.tasks} games at the same time.');
+  // NOTE: with `book-store-tasks` of `config.ini`, libedax learns several games at the same time.
+  if (_nikque.tasks > 1) {
+    _print('learn up to ${_nikque.tasks} games at the same time.');
   }
 
   while (true) {
-    final tasks = gamesLearner.tasks;
+    final tasks = _nikque.tasks;
     final games = tasks > 1
         ? findEntries(
             learningList,
@@ -94,7 +94,6 @@ void main(final List<String> arguments) {
     if (games.length > 1) {
       learningList = _learnGames(
         edax,
-        gamesLearner,
         games.map((final game) => game.text).toList(),
       );
       continue;
@@ -248,9 +247,8 @@ class _NikqueLibEdax {
           },
       ];
     } finally {
-      calloc
-        ..free(games)
-        ..free(status);
+      malloc.free(games);
+      calloc.free(status);
     }
   }
 
@@ -272,25 +270,26 @@ class _NikqueLibEdax {
   /// Return true with an older libedax (it doesn't tell it).
   bool keepUnreadBook(final String path) {
     final keepUnread = _keepUnread;
-    if (keepUnread == null) return true;
-    final file = path.toNativeUtf8();
-    try {
-      return keepUnread(file) != 0;
-    } finally {
-      calloc.free(file);
-    }
+    return keepUnread == null || _callWithPath(keepUnread, path) != 0;
   }
 
   /// Save the book to [path], and return whether it has been saved.
   /// Return null if libedax doesn't have the function which tells it.
   bool? saveBook(final String path) {
     final saveTo = _saveTo;
-    if (saveTo == null) return null;
+    return saveTo == null ? null : _callWithPath(saveTo, path) != 0;
+  }
+
+  /// Call [function] with [path] as a null-terminated UTF-8 string.
+  static int _callWithPath(
+    final int Function(Pointer<Utf8>) function,
+    final String path,
+  ) {
     final file = path.toNativeUtf8();
     try {
-      return saveTo(file) != 0;
+      return function(file);
     } finally {
-      calloc.free(file);
+      malloc.free(file);
     }
   }
 }
@@ -323,15 +322,11 @@ String? _gameLine(final String text) {
 }
 
 /// Learn the games of [texts] at the same time, and return the new content of learning list.
-Uint8List _learnGames(
-  final LibEdax edax,
-  final _NikqueLibEdax gamesLearner,
-  final List<String> texts,
-) {
+Uint8List _learnGames(final LibEdax edax, final List<String> texts) {
   _print('start to learn ${texts.length} games.');
   texts.forEach(stdout.writeln);
   stdout.writeln();
-  final results = gamesLearner.learn(
+  final results = _nikque.learn(
     texts.map((final text) => _gameLine(text)!).toList(),
   );
   stdout.writeln();

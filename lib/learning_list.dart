@@ -29,7 +29,7 @@ class LearningEntry {
   final int end;
 }
 
-/// The result of [takeEntry].
+/// The result of [takeEntry] and [takeEntries].
 class TakenEntry {
   const TakenEntry(this.log, this.rest);
 
@@ -131,15 +131,13 @@ TakenEntry takeEntry(
   final isFirst = first != null && first.text == text;
   // NOTE: learning list can be edited while learning.
   final entry = isFirst ? first : findEntry(bytes, text: text);
-  final log = BytesBuilder(copy: false);
-
   if (entry == null) {
-    log.add(latin1.encode('${_logText(text, skipReason)}\n'));
-    return TakenEntry(log.takeBytes(), bytes);
+    return TakenEntry(latin1.encode('${_logText(text, skipReason)}\n'), bytes);
   }
 
   final start = isFirst ? _bomLength(bytes) : entry.start;
-  log.add(Uint8List.sublistView(bytes, start, entry.start));
+  final log = BytesBuilder(copy: false)
+    ..add(Uint8List.sublistView(bytes, start, entry.start));
   if (skipReason == null) {
     log.add(Uint8List.sublistView(bytes, entry.start, entry.end));
     if (bytes[entry.end - 1] != _lf) log.addByte(_lf);
