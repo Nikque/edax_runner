@@ -8,6 +8,66 @@ Uint8List _bytes(final String text) => Uint8List.fromList(utf8.encode(text));
 
 String _text(final Uint8List bytes) => utf8.decode(bytes);
 
+/// Learning list and learned log in memory, with the clock of a file system that keeps the time of a
+/// change in seconds: [edit] at a step (see [onStep]) is an edit saved by the user at that time.
+class _Files implements LearningListFiles {
+  _Files(final String list) : list = _bytes(list);
+
+  Uint8List list;
+  Uint8List? saving;
+  final log = BytesBuilder();
+  var _time = 0;
+  final steps = <String>[];
+
+  /// Called at each step (read, stamp, save, log, replace), with its name.
+  void Function(String step)? onStep;
+
+  /// The user saves learning list with [content] (in the same second as the last change if [sameTime]).
+  void edit(final String content, {final bool sameTime = false}) {
+    list = _bytes(content);
+    if (!sameTime) _time++;
+  }
+
+  int count(final String step) => steps.where((final s) => s == step).length;
+
+  void _step(final String name) {
+    steps.add(name);
+    onStep?.call(name);
+  }
+
+  @override
+  Uint8List read() {
+    _step('read');
+    return list;
+  }
+
+  @override
+  String stamp() {
+    _step('stamp');
+    return '${list.length} $_time';
+  }
+
+  @override
+  void save(final Uint8List rest) {
+    _step('save');
+    saving = rest;
+  }
+
+  @override
+  void appendLog(final Uint8List log) {
+    _step('log');
+    this.log.add(log);
+  }
+
+  @override
+  void replace() {
+    _step('replace');
+    list = saving!;
+    saving = null;
+    _time++;
+  }
+}
+
 void main() {
   group('findEntry', () {
     test('passes over comment lines and blank lines', () {
@@ -328,6 +388,34 @@ void main() {
     final taken = takeEntry(bytes, entry.text, skipReason: 'unknown format');
     expect(taken.log.sublist(taken.log.length - 3), [0x82, 0xA0, 0x0A]);
     expect(taken.rest, [0x66, 0x35, 0x82, 0xA0]);
+  });
+
+  group('removeTexts', () {
+    test('logs the texts once, then replaces learning list', () {
+      final files = _Files('// a\nf5d6\nfix\n');
+      final rest = removeTexts(files, ['f5d6'], [null]);
+      expect(_text(rest), 'fix\n');
+      expect(_text(files.list), 'fix\n');
+      expect(_text(files.log.takeBytes()), '// a\nf5d6\n');
+      expect(files.count('log'), 1);
+      expect(files.count('replace'), 1);
+      expect(files.saving, isNull);
+    });
+
+    test('reads learning list again if it was saved meanwhile', () {
+      final files = _Files('// a\nf5d6\nfix\n');
+      var edited = false;
+      files.onStep = (final step) {
+        if (step == 'save' && !edited) {
+          edited = true;
+          files.edit('// a\nf5d6\nfix\nf5f6\n');
+        }
+      };
+      removeTexts(files, ['f5d6'], [null]);
+      expect(_text(files.list), 'fix\nf5f6\n');
+      expect(_text(files.log.takeBytes()), '// a\nf5d6\n');
+      expect(files.count('log'), 1);
+    });
   });
 
   test('isUtf16', () {

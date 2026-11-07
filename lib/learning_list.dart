@@ -200,3 +200,47 @@ String _logText(final String text, final String? skipReason) =>
     skipReason == null
     ? text
     : '$commentHead [edax_runner] skipped ($skipReason): $text';
+
+/// The files which [removeTexts] reads and writes.
+abstract interface class LearningListFiles {
+  /// Read learning list.
+  Uint8List read();
+
+  /// Size and time of the last change of learning list,
+  /// to tell whether it was saved since it was read.
+  String stamp();
+
+  /// Save [rest], the new content of learning list, to another file first.
+  void save(final Uint8List rest);
+
+  /// Append [log] to learned log.
+  void appendLog(final Uint8List log);
+
+  /// Replace learning list with the file written by [save].
+  void replace();
+}
+
+/// Move [texts] from learning list to learned log, as [takeEntries] does,
+/// and return the new content of learning list.
+///
+/// [skipReasons] has the reason for each text which hasn't been learned (null if learned).
+Uint8List removeTexts(
+  final LearningListFiles files,
+  final List<String> texts,
+  final List<String?> skipReasons,
+) {
+  for (var attempt = 1; ; attempt++) {
+    final stamp = files.stamp();
+    final taken = takeEntries(files.read(), texts, skipReasons);
+    // NOTE: don't overwrite learning list directly,
+    // so that it isn't broken even if edax_runner is killed while saving.
+    files.save(taken.rest);
+    // NOTE: learning list may have been saved by the user since it was read:
+    // then it is read again, so that the edit isn't lost (a few times at most).
+    if (attempt < 5 && files.stamp() != stamp) continue;
+    files
+      ..appendLog(taken.log)
+      ..replace();
+    return taken.rest;
+  }
+}

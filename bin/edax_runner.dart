@@ -453,31 +453,34 @@ Uint8List _removeLearnedText(final String text, {final String? skipReason}) =>
 Uint8List _removeLearnedTexts(
   final List<String> texts,
   final List<String?> skipReasons,
-) {
-  for (var attempt = 1; ; attempt++) {
-    final stamp = _learningListStamp();
-    final taken = takeEntries(_readLearningList(), texts, skipReasons);
-    // NOTE: don't overwrite learning list directly,
-    // so that it isn't broken even if edax_runner is killed while saving.
-    final saving = File('$_learningListFile$_savingExt');
-    _retry(() => saving.writeAsBytesSync(taken.rest, flush: true));
-    // NOTE: learning list may have been saved by the user since it was read:
-    // then it is read again, so that the edit isn't lost (a few times at most).
-    if (attempt < 5 && _learningListStamp() != stamp) continue;
-    _retry(
-      () => File(
-        _learnedLogFile,
-      ).writeAsBytesSync(taken.log, mode: FileMode.append, flush: true),
-    );
-    _retry(() => saving.renameSync(_learningListFile));
-    return taken.rest;
-  }
-}
+) => removeTexts(_LearningListFiles(), texts, skipReasons);
 
-/// Size and time of the last change of learning list, to tell whether it was saved since it was read.
-String _learningListStamp() {
-  final stat = _retry(() => File(_learningListFile).statSync());
-  return '${stat.size} ${stat.modified.microsecondsSinceEpoch}';
+/// The files of learning list and learned log, retried while they are locked.
+class _LearningListFiles implements LearningListFiles {
+  final _saving = File('$_learningListFile$_savingExt');
+
+  @override
+  Uint8List read() => _readLearningList();
+
+  @override
+  String stamp() {
+    final stat = _retry(() => File(_learningListFile).statSync());
+    return '${stat.size} ${stat.modified.microsecondsSinceEpoch}';
+  }
+
+  @override
+  void save(final Uint8List rest) =>
+      _retry(() => _saving.writeAsBytesSync(rest, flush: true));
+
+  @override
+  void appendLog(final Uint8List log) => _retry(
+    () => File(
+      _learnedLogFile,
+    ).writeAsBytesSync(log, mode: FileMode.append, flush: true),
+  );
+
+  @override
+  void replace() => _retry(() => _saving.renameSync(_learningListFile));
 }
 
 /// Retry [action] for a while,
