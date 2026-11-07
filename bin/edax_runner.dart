@@ -60,7 +60,7 @@ void main(final List<String> arguments) {
     );
   }
 
-  var learningList = _readLearningList();
+  _readLearningList(); // NOTE: an error of the list (UTF-16) is told before the book is loaded.
   final libraryPath = _edaxSharedLibraryPath();
   _nikque = _NikqueLibEdax(libraryPath);
   final edax = LibEdax(libraryPath)
@@ -88,6 +88,10 @@ void main(final List<String> arguments) {
     exitCode = 1;
     return;
   }
+
+  // NOTE: read after the book is loaded (minutes for a large book): the first line (or group) to learn
+  // is taken from the list as it is now, as the next ones are. (it was taken from the list read before)
+  var learningList = _readLearningList();
 
   // NOTE: with `book-store-tasks` of `config.ini`, libedax learns several games at the same time.
   if (_nikque.tasks > 1) {
