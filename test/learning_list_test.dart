@@ -41,6 +41,14 @@ void main() {
       expect(findEntry(bytes, text: 'fix')!.end, bytes.length);
     });
 
+    test('handles the lines terminated by CR only', () {
+      final bytes = _bytes('// comment\rf5d6\r\rfix');
+      final entry = findEntry(bytes)!;
+      expect(entry.text, 'f5d6');
+      expect(_text(bytes.sublist(entry.start, entry.end)), 'f5d6\r');
+      expect(findEntry(bytes, text: 'fix')!.end, bytes.length);
+    });
+
     test('accepts the comments which are not UTF-8', () {
       // "// 学習" in Shift_JIS
       final bytes = Uint8List.fromList([
@@ -87,6 +95,22 @@ void main() {
       final taken = takeEntry(bytes, 'f5d6');
       expect(_text(taken.log), 'f5d6\n');
       expect(taken.rest, [...bom, ...utf8.encode('fix\n')]);
+    });
+
+    test('keeps the line terminators CR', () {
+      final taken = takeEntry(_bytes('// a\rf5d6\rfix\r'), 'f5d6');
+      expect(_text(taken.log), '// a\rf5d6\r');
+      expect(_text(taken.rest), 'fix\r');
+      final skipped = takeEntry(
+        _bytes('f5f5\rexit\r'),
+        'f5f5',
+        skipReason: 'illegal move',
+      );
+      expect(
+        _text(skipped.log),
+        '// [edax_runner] skipped (illegal move): f5f5\r',
+      );
+      expect(_text(skipped.rest), 'exit\r');
     });
 
     test('terminates the log with a line terminator', () {
@@ -157,6 +181,15 @@ void main() {
         'f5f4',
       ]);
       expect(_text(bytes.sublist(entries[1].start, entries[1].end)), 'f5f6\n');
+    });
+
+    test('finds the texts of the lines terminated by CR only', () {
+      final entries = findEntries(
+        _bytes('f5d6\rf5f6\r\rfix\r'),
+        max: 8,
+        accept: isGame,
+      );
+      expect(entries.map((final entry) => entry.text), ['f5d6', 'f5f6']);
     });
 
     test('finds up to max texts', () {

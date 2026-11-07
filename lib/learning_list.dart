@@ -2,7 +2,7 @@
 ///
 /// The content is handled as bytes, not as text. So,
 /// * the comments in any encoding (UTF-8, Shift_JIS, ...) are kept as they are.
-/// * the line terminators (LF, CRLF) are kept as they are.
+/// * the line terminators (LF, CRLF, CR) are kept as they are.
 /// * a lot of strings aren't created even if learning list has a lot of lines.
 library;
 
@@ -68,8 +68,7 @@ LearningEntry? _findEntryFrom(
 }) {
   var start = from;
   while (start < bytes.length) {
-    final lf = bytes.indexOf(_lf, start);
-    final end = lf < 0 ? bytes.length : lf + 1;
+    final end = _nextLine(bytes, start);
     final line = _trim(bytes, start, end);
     if (line.isNotEmpty &&
         !line.contains(commentHead) &&
@@ -79,6 +78,29 @@ LearningEntry? _findEntryFrom(
     start = end;
   }
   return null;
+}
+
+/// The offset of the line after the one at [start]: after its LF, CR LF or CR, or the end of [bytes].
+///
+/// NOTE: a list saved with CR only (as old Mac editors do) was read as one line,
+/// which was moved to learned log as a text of unknown format.
+int _nextLine(final Uint8List bytes, final int start) {
+  for (var i = start; i < bytes.length; i++) {
+    final byte = bytes[i];
+    if (byte == _lf) return i + 1;
+    if (byte == _cr) {
+      return i + 1 < bytes.length && bytes[i + 1] == _lf ? i + 2 : i + 1;
+    }
+  }
+  return bytes.length;
+}
+
+/// The line terminator of the line of [bytes] from [start] to [end] (empty if it has none).
+String _terminator(final Uint8List bytes, final int start, final int end) {
+  if (end > start && bytes[end - 1] == _lf) {
+    return end - start >= 2 && bytes[end - 2] == _cr ? '\r\n' : '\n';
+  }
+  return end > start && bytes[end - 1] == _cr ? '\r' : '';
 }
 
 /// The line of [bytes] from [start] to [end], without the white spaces of both ends.
@@ -138,13 +160,15 @@ TakenEntry takeEntry(
   final start = isFirst ? _bomLength(bytes) : entry.start;
   final log = BytesBuilder(copy: false)
     ..add(Uint8List.sublistView(bytes, start, entry.start));
+  final terminator = _terminator(bytes, entry.start, entry.end);
   if (skipReason == null) {
     log.add(Uint8List.sublistView(bytes, entry.start, entry.end));
-    if (bytes[entry.end - 1] != _lf) log.addByte(_lf);
+    if (terminator.isEmpty) log.addByte(_lf);
   } else {
-    final isCrLf = entry.end - entry.start >= 2 && bytes[entry.end - 2] == _cr;
     log.add(
-      latin1.encode('${_logText(text, skipReason)}${isCrLf ? '\r\n' : '\n'}'),
+      latin1.encode(
+        '${_logText(text, skipReason)}${terminator.isEmpty ? '\n' : terminator}',
+      ),
     );
   }
 
