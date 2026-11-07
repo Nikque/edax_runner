@@ -384,7 +384,9 @@ Uint8List _learnGames(final LibEdax edax, final List<String> texts) {
       _print('WARNING: has skipped "${texts[i]}". (${skipReasons[i]})');
     }
   }
-  _saveBook(edax);
+  // NOTE: when no game has been learned (they all have an illegal move), the book isn't changed:
+  // it isn't saved again. (a whole large book was saved for nothing)
+  if (results.contains(_GameResult.learned)) _saveBook(edax);
   final rest = _removeLearnedTexts(texts, skipReasons);
   _print('has removed ${texts.length} games.');
   return rest;
