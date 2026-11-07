@@ -57,6 +57,9 @@ class _Files implements LearningListFiles {
   }
 
   @override
+  void wait() => _step('wait');
+
+  @override
   void replace() {
     _step('replace');
     list = saving!;
@@ -426,6 +429,68 @@ void main() {
       removeTexts(files, ['f5d6'], [null]);
       expect(_text(files.list), 'bye\n');
       expect(files.count('log'), 1);
+    });
+
+    test('keeps an edit saved while learned log is appended', () {
+      final files = _Files('// a\nf5d6\nfix\n');
+      var edited = false;
+      files.onStep = (final step) {
+        if (step == 'log' && !edited) {
+          edited = true;
+          files.edit('// a\nf5d6\nfix\nf5f6\n');
+        }
+      };
+      removeTexts(files, ['f5d6'], [null]);
+      expect(_text(files.list), 'fix\nf5f6\n');
+      expect(_text(files.log.takeBytes()), '// a\nf5d6\n');
+      expect(files.count('log'), 1);
+    });
+
+    test('keeps the edits saved again and again (more than 5 times)', () {
+      final files = _Files('f5d6\nfix\n');
+      var n = 0;
+      files.onStep = (final step) {
+        if (step == 'save' && n < 7) {
+          n++;
+          files.edit('${_text(files.list)}e$n\n');
+        }
+      };
+      removeTexts(files, ['f5d6'], [null]);
+      expect(_text(files.list), 'fix\ne1\ne2\ne3\ne4\ne5\ne6\ne7\n');
+      expect(_text(files.log.takeBytes()), 'f5d6\n');
+      expect(files.count('wait'), greaterThan(0));
+    });
+
+    test(
+      'leaves the lines above the texts, logged once, when it reads learning list again',
+      () {
+        final files = _Files('// a\nf5d6\nfix\n');
+        var edited = false;
+        files.onStep = (final step) {
+          if (step == 'save' && !edited) {
+            edited = true;
+            files.edit('exit\n// a\nf5d6\nfix\n');
+          }
+        };
+        removeTexts(files, ['f5d6'], [null]);
+        expect(_text(files.list), 'exit\n// a\nfix\n');
+        expect(_text(files.log.takeBytes()), '// a\nf5d6\n');
+      },
+    );
+
+    test('leaves learning list as it is if it keeps changing', () {
+      final files = _Files('f5d6\nfix\n');
+      var n = 0;
+      files.onStep = (final step) {
+        if (step == 'save') files.edit('f5d6\nfix\ne${++n}\n');
+      };
+      expect(
+        () => removeTexts(files, ['f5d6'], [null]),
+        throwsA(isA<StateError>()),
+      );
+      expect(_text(files.list), 'f5d6\nfix\ne$n\n');
+      expect(files.count('replace'), 0);
+      expect(_text(files.log.takeBytes()), 'f5d6\n');
     });
   });
 

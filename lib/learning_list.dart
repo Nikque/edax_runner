@@ -142,14 +142,16 @@ List<LearningEntry> findEntries(
 
 /// Take [text] out of [bytes], which is the content of learning list.
 ///
-/// If [text] is still the first text to learn, the lines above it are also taken out. <br>
+/// If [text] is still the first text to learn, the lines above it are also taken out
+/// (unless [withLinesAbove] is false). <br>
 /// If [skipReason] is specified, [text] is logged as a comment with the reason.
 TakenEntry takeEntry(
   final Uint8List bytes,
   final String text, {
   final String? skipReason,
+  final bool withLinesAbove = true,
 }) {
-  final first = findEntry(bytes);
+  final first = withLinesAbove ? findEntry(bytes) : null;
   final isFirst = first != null && first.text == text;
   // NOTE: learning list can be edited while learning.
   final entry = isFirst ? first : findEntry(bytes, text: text);
@@ -184,12 +186,18 @@ TakenEntry takeEntry(
 TakenEntry takeEntries(
   final Uint8List bytes,
   final List<String> texts,
-  final List<String?> skipReasons,
-) {
+  final List<String?> skipReasons, {
+  final bool withLinesAbove = true,
+}) {
   final log = BytesBuilder(copy: false);
   var rest = bytes;
   for (var i = 0; i < texts.length; i++) {
-    final taken = takeEntry(rest, texts[i], skipReason: skipReasons[i]);
+    final taken = takeEntry(
+      rest,
+      texts[i],
+      skipReason: skipReasons[i],
+      withLinesAbove: withLinesAbove,
+    );
     log.add(taken.log);
     rest = taken.rest;
   }
@@ -222,31 +230,63 @@ abstract interface class LearningListFiles {
 
   /// Replace learning list with the file written by [save].
   void replace();
+
+  /// Wait a little before learning list is read again (the user may still be editing it).
+  void wait();
 }
+
+/// [removeTexts] reads learning list again at once up to this number of times, then waits before each time.
+const int _attemptsWithoutWait = 5;
+
+/// [removeTexts] gives up after this number of attempts (about a minute with a wait of a second).
+const int _maxAttempts = 60;
 
 /// Move [texts] from learning list to learned log, as [takeEntries] does,
 /// and return the new content of learning list.
 ///
 /// [skipReasons] has the reason for each text which hasn't been learned (null if learned).
+/// Throw [StateError] if learning list keeps changing: it is left as the user saved it
+/// (the texts are logged, and are learned again at the next run).
 Uint8List removeTexts(
   final LearningListFiles files,
   final List<String> texts,
   final List<String?> skipReasons,
 ) {
+  var bytes = files.read();
+  var taken = takeEntries(bytes, texts, skipReasons);
+  final logged = taken.log;
+  // NOTE: learned log first, so that nothing comes between the last check of learning list and its
+  // replacement below. (an edit saved while the log was appended was lost) If edax_runner is killed
+  // before the list is replaced, the texts are learned again at the next run, and logged twice.
+  files.appendLog(logged);
   for (var attempt = 1; ; attempt++) {
-    final bytes = files.read();
-    final taken = takeEntries(bytes, texts, skipReasons);
     // NOTE: don't overwrite learning list directly,
     // so that it isn't broken even if edax_runner is killed while saving.
     files.save(taken.rest);
     // NOTE: learning list may have been saved by the user since it was read:
-    // then it is read again, so that the edit isn't lost (a few times at most).
+    // then it is read again, so that the edit isn't lost.
     // Its content is compared: an edit can leave the same size and time of the last change
     // (a file system which keeps the time in seconds, or in 2 seconds as FAT32).
-    if (attempt < 5 && !_sameBytes(files.read(), bytes)) continue;
-    files
-      ..appendLog(taken.log)
-      ..replace();
-    return taken.rest;
+    final now = files.read();
+    if (_sameBytes(now, bytes)) {
+      files.replace();
+      return taken.rest;
+    }
+    if (attempt >= _maxAttempts) {
+      throw StateError(
+        'learning list kept changing while edax_runner rewrote it: it is left as it is.'
+        ' (the learned texts are in learned log, and are learned again at the next run)',
+      );
+    }
+    // NOTE: up to 5.3.0+nikque.14 the list was replaced after the 5th attempt, and the edit was lost.
+    if (attempt >= _attemptsWithoutWait) files.wait();
+    bytes = now;
+    // NOTE: the texts are taken out of the new content. Learned log has them already: if the new content
+    // would log other lines (the user edited the lines above the texts, or moved the texts), the lines
+    // above the texts are left in the list, so that nothing is lost.
+    final again = takeEntries(bytes, texts, skipReasons);
+    taken = _sameBytes(again.log, logged)
+        ? again
+        : takeEntries(bytes, texts, skipReasons, withLinesAbove: false);
   }
 }

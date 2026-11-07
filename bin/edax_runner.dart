@@ -475,6 +475,9 @@ class _LearningListFiles implements LearningListFiles {
 
   @override
   void replace() => _retry(() => _saving.renameSync(_learningListFile));
+
+  @override
+  void wait() => sleep(_fileRetryInterval);
 }
 
 /// Retry [action] for a while,

@@ -69,6 +69,7 @@ There are **only 5 rules**. Example is [here](https://github.com/Nikque/edax_run
   - Blank lines are ignored.
   - A line which can't be learned (unknown format, illegal move) is skipped. It's recorded in `learned_log.txt` as a comment like `// [edax_runner] skipped (illegal move): F5F5`.
   - You can edit `learning_list.txt` while edax_runner is running. edax_runner reads it again whenever it has finished learning a line (or a group of games learned at the same time). For example, you can stop edax_runner after the current line (or group) by adding `exit` to the head.
+  - If `learning_list.txt` is saved while edax_runner rewrites it to remove the learned line, edax_runner reads it again and removes the line from what was saved. If it keeps being saved for about a minute, edax_runner stops without rewriting `learning_list.txt` (the learned line is recorded in `learned_log.txt`, and is learned again at the next run).
   - The comments can be written in any encoding except UTF-16.
 
 ## What this fork changes
