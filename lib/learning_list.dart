@@ -201,14 +201,18 @@ String _logText(final String text, final String? skipReason) =>
     ? text
     : '$commentHead [edax_runner] skipped ($skipReason): $text';
 
+bool _sameBytes(final Uint8List a, final Uint8List b) {
+  if (a.length != b.length) return false;
+  for (var i = 0; i < a.length; i++) {
+    if (a[i] != b[i]) return false;
+  }
+  return true;
+}
+
 /// The files which [removeTexts] reads and writes.
 abstract interface class LearningListFiles {
   /// Read learning list.
   Uint8List read();
-
-  /// Size and time of the last change of learning list,
-  /// to tell whether it was saved since it was read.
-  String stamp();
 
   /// Save [rest], the new content of learning list, to another file first.
   void save(final Uint8List rest);
@@ -230,14 +234,16 @@ Uint8List removeTexts(
   final List<String?> skipReasons,
 ) {
   for (var attempt = 1; ; attempt++) {
-    final stamp = files.stamp();
-    final taken = takeEntries(files.read(), texts, skipReasons);
+    final bytes = files.read();
+    final taken = takeEntries(bytes, texts, skipReasons);
     // NOTE: don't overwrite learning list directly,
     // so that it isn't broken even if edax_runner is killed while saving.
     files.save(taken.rest);
     // NOTE: learning list may have been saved by the user since it was read:
     // then it is read again, so that the edit isn't lost (a few times at most).
-    if (attempt < 5 && files.stamp() != stamp) continue;
+    // Its content is compared: an edit can leave the same size and time of the last change
+    // (a file system which keeps the time in seconds, or in 2 seconds as FAT32).
+    if (attempt < 5 && !_sameBytes(files.read(), bytes)) continue;
     files
       ..appendLog(taken.log)
       ..replace();

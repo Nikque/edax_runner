@@ -151,7 +151,7 @@ Other changes:
 
 - `[0 0]F5F6`, `[ 0 0 ] F5F6` and `2, F5F6` are accepted.
 - The directory of the executable is used if `learning_list.txt` isn't in the current directory.
-- `learning_list.txt` is handled faster with less memory (it's handled as bytes, and read once per line to learn).
+- `learning_list.txt` is handled faster with less memory (it's handled as bytes. It's read twice per line to learn: to take the line out, and to check that it hasn't been changed before it is rewritten).
 - If `book.dat` can't be saved (e.g. another program opens `book.dat`), saving is retried every second, up to 30 times. If it still can't be saved, edax_runner stops without changing `learning_list.txt`. (since 5.3.0+nikque.3; before, the lines were removed as learned even if the book wasn't saved)
 - If `book.dat` could not be read at startup (damaged, truncated), it is kept as `data/book.dat.damaged` before the learned book replaces it. If it cannot be kept, edax_runner stops without changing `learning_list.txt`. (since 5.3.0+nikque.10, with libedax of Edax 4.5.5 nikque.16 or later)
 - If `book.dat` could not be opened at startup (another program had it open without sharing, and so on), libedax waits about 2 seconds and tries again. If it still cannot be opened, edax_runner stops without learning, and changes neither `book.dat` nor `learning_list.txt`: run it again later. (with a libedax that has the function `edax_book_file_status`; an older libedax takes such a file for a damaged one: edax_runner learned into an empty book, and moved the original `book.dat` to `.damaged`)

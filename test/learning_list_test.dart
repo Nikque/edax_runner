@@ -16,16 +16,19 @@ class _Files implements LearningListFiles {
   Uint8List list;
   Uint8List? saving;
   final log = BytesBuilder();
-  var _time = 0;
+
+  /// The time of the last change of learning list, in seconds. (with the size, what edax_runner
+  /// up to 5.3.0+nikque.14 compared to tell whether the list was saved since it was read)
+  var time = 0;
   final steps = <String>[];
 
-  /// Called at each step (read, stamp, save, log, replace), with its name.
+  /// Called at each step (read, save, log, replace), with its name.
   void Function(String step)? onStep;
 
   /// The user saves learning list with [content] (in the same second as the last change if [sameTime]).
   void edit(final String content, {final bool sameTime = false}) {
     list = _bytes(content);
-    if (!sameTime) _time++;
+    if (!sameTime) time++;
   }
 
   int count(final String step) => steps.where((final s) => s == step).length;
@@ -39,12 +42,6 @@ class _Files implements LearningListFiles {
   Uint8List read() {
     _step('read');
     return list;
-  }
-
-  @override
-  String stamp() {
-    _step('stamp');
-    return '${list.length} $_time';
   }
 
   @override
@@ -64,7 +61,7 @@ class _Files implements LearningListFiles {
     _step('replace');
     list = saving!;
     saving = null;
-    _time++;
+    time++;
   }
 }
 
@@ -414,6 +411,20 @@ void main() {
       removeTexts(files, ['f5d6'], [null]);
       expect(_text(files.list), 'fix\nf5f6\n');
       expect(_text(files.log.takeBytes()), '// a\nf5d6\n');
+      expect(files.count('log'), 1);
+    });
+
+    test('notices an edit of the same size saved in the same second', () {
+      final files = _Files('// a\nf5d6\nfix\n');
+      var edited = false;
+      files.onStep = (final step) {
+        if (step == 'save' && !edited) {
+          edited = true;
+          files.edit('// a\nf5d6\nbye\n', sameTime: true);
+        }
+      };
+      removeTexts(files, ['f5d6'], [null]);
+      expect(_text(files.list), 'bye\n');
       expect(files.count('log'), 1);
     });
   });

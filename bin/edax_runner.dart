@@ -463,12 +463,6 @@ class _LearningListFiles implements LearningListFiles {
   Uint8List read() => _readLearningList();
 
   @override
-  String stamp() {
-    final stat = _retry(() => File(_learningListFile).statSync());
-    return '${stat.size} ${stat.modified.microsecondsSinceEpoch}';
-  }
-
-  @override
   void save(final Uint8List rest) =>
       _retry(() => _saving.writeAsBytesSync(rest, flush: true));
 
