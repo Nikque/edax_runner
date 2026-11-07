@@ -77,6 +77,18 @@ void main(final List<String> arguments) {
     // doesn't have to save the whole book to "book.dat.store" as well. (an older libedax ignores this)
     ..edaxSetOption('book-store-auto-save', 'off');
 
+  // NOTE: libedax waits a little for a book file which another program (an antivirus, a backup...) holds,
+  // and starts with a new book if it still can't open it. Don't learn into that new book.
+  if (_nikque.bookFileUnopened(_bookFile)) {
+    _print(
+      'ERROR: "$_bookFile" could not be opened (another program may be using it):'
+      ' edax_runner stops without learning. "$_learningListFile" and "$_bookFile" are not changed.',
+    );
+    edax.libedaxTerminate();
+    exitCode = 1;
+    return;
+  }
+
   // NOTE: with `book-store-tasks` of `config.ini`, libedax learns several games at the same time.
   if (_nikque.tasks > 1) {
     _print('learn up to ${_nikque.tasks} games at the same time.');
@@ -216,6 +228,15 @@ class _NikqueLibEdax {
     } on ArgumentError {
       // NOTE: libedax of Edax 4.5.5 nikque.15 and before doesn't have this function.
     }
+    try {
+      _fileStatus = library
+          .lookupFunction<
+            Int32 Function(Pointer<Utf8>),
+            int Function(Pointer<Utf8>)
+          >('edax_book_file_status');
+    } on ArgumentError {
+      // NOTE: libedax of Edax 4.5.5 nikque.26 and before doesn't have this function.
+    }
   }
 
   int Function()? _storeTasks;
@@ -223,6 +244,7 @@ class _NikqueLibEdax {
   int Function(Pointer<Utf8>)? _saveTo;
   int Function()? _failed;
   int Function(Pointer<Utf8>)? _keepUnread;
+  int Function(Pointer<Utf8>)? _fileStatus;
 
   /// The number of games to learn at the same time. (`book-store-tasks`)
   int get tasks => _storeGames == null ? 1 : (_storeTasks?.call() ?? 1);
@@ -271,6 +293,14 @@ class _NikqueLibEdax {
   bool keepUnreadBook(final String path) {
     final keepUnread = _keepUnread;
     return keepUnread == null || _callWithPath(keepUnread, path) != 0;
+  }
+
+  /// Whether libedax could not open [path] (the book file of `-book-file`) at the start, even after waiting
+  /// a little: it was not loaded, and the book is a new one (`edax_book_file_status` returns 2).
+  /// Return false with an older libedax (it doesn't tell it: such a file is taken for a damaged one).
+  bool bookFileUnopened(final String path) {
+    final fileStatus = _fileStatus;
+    return fileStatus != null && _callWithPath(fileStatus, path) == 2;
   }
 
   /// Save the book to [path], and return whether it has been saved.

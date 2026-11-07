@@ -154,6 +154,7 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 - `learning_list.txt` の処理を速くし、メモリも少なくしました（バイト列のまま扱い、1行学習するごとに1回だけ読みます）。
 - `book.dat` を保存できないとき（ほかのプログラムが `book.dat` を開いている、など）は、1秒おきに30回まで保存をやり直します。それでも保存できなければ、`learning_list.txt` を変えずに止まります（5.3.0+nikque.3 から。それまでは、保存できていなくても学習済みとして行を消していました）。
 - 起動のときに `book.dat` を読めなかった（壊れている・途中で切れている）ときは、学習した book で置き換える前に `data/book.dat.damaged` として残します。残せなければ、`learning_list.txt` を変えずに止まります（5.3.0+nikque.10 から。Edax 4.5.5 nikque.16 以降の libedax で）。
+- 起動のときに `book.dat` を開けなかった（ほかのプログラムが共有なしで開いていた、など）ときは、libedax が 2 秒ほど待って開き直します。それでも開けなければ、edax_runner は学習を始めずに止まります。`book.dat` と `learning_list.txt` は変えません。時間をおいて起動し直してください（関数 `edax_book_file_status` を持つ libedax で。それより前の libedax では、壊れた book と同じに扱われ、空の book に学習を始めて、元の `book.dat` を `.damaged` に移していました）。
 - 同じフォルダーで 2 つ目の edax_runner を起動すると、何もせずに止まります（動いている間、フォルダーの `edax_runner.lock` をつかみます。5.3.0+nikque.10 から）。
 - edax_runner を強制終了しても、`book.dat`・`learning_list.txt`・`learned_log.txt` は壊れません。学習の途中だった行（同時に学習していた棋譜は、その1組）は、次に起動したときに最初から学習します。book を保存した直後（`learning_list.txt` を書き換える前）に止めた場合は、その行（組）をもう一度学習し、`learned_log.txt` に2回載ることがあります。
 
