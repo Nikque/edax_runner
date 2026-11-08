@@ -4,6 +4,31 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。テストと実測の記録は [docs/validation/changelog.ja.md](docs/validation/changelog.ja.md) にあります。
 
+## 5.3.0+nikque.15
+
+edax_runner の不具合（起動のときに開けなかった `book.dat`、`learning_list.txt`）を直し、同梱の libedax を Edax 4.5.5 nikque.27 に更新しました。タグは `v5.3.0-nikque.15`、libedax：[Edax 4.5.5 nikque.27](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.27)。この edax_runner と nikque.27 以降の libedax は組にして使います（**互換性**を見てください）。
+
+**変更**
+
+- libedax を Edax 4.5.5 nikque.27 のものにしました（Edax の変更点：[nikque.27](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque27)）。起動のときに book のファイルを開けない（ほかのプログラムが共有なしで開いている）と、libedax は 2 秒ほど待って開き直します。それでも開けなければ、どの保存もそのファイルを置き換えず、新しい関数 `edax_book_file_status` がそれを知らせます。
+- 起動のときに `book.dat` を開けなかった（ウイルス対策・バックアップなどのプログラムが共有なしで開いていた）ときは、edax_runner は学習せずに止まり（終了コード 1）、`book.dat` も `learning_list.txt` も変えません。これまでは空の book に学習し、その book で `book.dat` を置き換えて、元の `book.dat` を `data/book.dat.damaged` に移していました。
+- 最初に学習する行（組）も、次からの行と同じく、book を読み込んだ後の `learning_list.txt` から取ります。これまでは book を読み込む前に読んだリストから取っていたので（大きな book では数分かかります）、その間に消した行や足した `exit` が間に合いませんでした。
+- 行の終わりが CR だけの `learning_list.txt` を 1 行ずつ読みます。これまでは全体を書式の違う 1 行として読み、リスト全体を `learned_log.txt` に移していました。
+- 同時に学習する棋譜が 1 局も学習できなかった（打てない手がある）ときは、book を保存し直しません。
+- 学習した行を `learning_list.txt` から消すときに、その間に保存された編集を、大きさと時刻だけでなく中身で見分け、何度保存されても、保存された中身から行を消します。1 分ほど保存が続くときは、リストを書き換えずに止まります（その行は `learned_log.txt` に記録してあり、次の起動でもう一度学習します）。これまでは 5 回目の後にリストを置き換え、編集が失われていました。`learned_log.txt` は、リストを最後に確かめる前に書くようにしました。
+- libedax（nikque）の関数を呼ぶ所を整理し、試験を足しました（38 件）。
+
+**互換性**
+
+- Edax 4.5.5 nikque.27 以降の libedax（同梱のもの）と使います。それより前の libedax では、起動のときに開けない `book.dat` は、5.3.0+nikque.14 と同じく壊れた book として扱われます。
+- nikque.27 以降の libedax を edax_runner 5.3.0+nikque.14 以前と組み合わせないでください。起動のときに `book.dat` を開けないと、book は守られますが、古い edax_runner は学習を始め、book を保存できずに 30 秒ほど再試しした後、誤りで終わり（終了コード 255）、`data/book.dat.saving` が残ります。
+- 起動のときに開けない book のファイルのほかは、edax_runner が使う libedax の関数とその動き、`eval.dat`、`config.ini` の設定は nikque.26（5.3.0+nikque.14）と同じです。`learning_list.txt` は 1 行学習するごとに 2 回読みます（行を取り出すときと、書き換える前に確かめるとき）。
+
+**未確認**：速さとメモリ、Linux・macOS の実機での実行。
+
+[検証記録](docs/validation/changelog.ja.md#530nikque15)
+
+---
 ## 5.3.0+nikque.14
 
 同梱の libedax を Edax 4.5.5 nikque.26 に更新しました。新しい関数 `edax_book_deviate_export` を使えるようにするための版です。タグは `v5.3.0-nikque.14`、libedax：[Edax 4.5.5 nikque.26](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.26)。

@@ -4,6 +4,31 @@
 
 Versions of this fork. The history of the original edax_runner (5.3.0 and earlier) follows below. The tests and measurements are in [docs/validation/changelog.en.md](docs/validation/changelog.en.md).
 
+## 5.3.0+nikque.15
+
+Fixes of edax_runner (a `book.dat` that could not be opened at startup, and `learning_list.txt`), with the bundled libedax updated to Edax 4.5.5 nikque.27. Tag `v5.3.0-nikque.15`; libedax: [Edax 4.5.5 nikque.27](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.27). This edax_runner and the libedax of nikque.27 or later go together (see **Compatibility**).
+
+**Changes**
+
+- libedax is now that of Edax 4.5.5 nikque.27 (Edax release notes: [nikque.27](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.md#v455-nikque27)). When the book file can't be opened at the start (another program has it open without sharing), libedax waits about 2 seconds and tries again; if it still can't, no save replaces that file, and the new function `edax_book_file_status` tells it.
+- If `book.dat` could not be opened at startup (an antivirus, a backup or another program had it open without sharing), edax_runner stops without learning (exit code 1) and changes neither `book.dat` nor `learning_list.txt`. Before, it learned into an empty book, which replaced `book.dat`, and the original `book.dat` was moved to `data/book.dat.damaged`.
+- The first line (or group) to learn is taken from `learning_list.txt` as it is after the book is loaded, as the next ones are. Before, it was taken from the list read before the book was loaded (which can take minutes for a large book), so a line removed or an `exit` added meanwhile came too late.
+- A `learning_list.txt` whose lines end with CR only is read line by line. Before, it was read as one line of unknown format, and the whole list was moved to `learned_log.txt`.
+- When none of the games learned at the same time could be learned (illegal moves), the book isn't saved again.
+- When the learned line is removed from `learning_list.txt`, an edit saved meanwhile is noticed by the content of the list (not only by its size and time), and the line is removed from what was saved, however many times it is saved. If it keeps being saved for about a minute, edax_runner stops without rewriting the list (the line is recorded in `learned_log.txt`, and is learned again at the next run). Before, the list was replaced after the 5th attempt, and the edit was lost. `learned_log.txt` is now written before the last check of the list.
+- The code calling the functions of libedax (nikque) is tidied up, and tests are added (38 tests).
+
+**Compatibility**
+
+- Use it with the libedax of Edax 4.5.5 nikque.27 or later (the bundled one). With an older libedax, a `book.dat` that can't be opened at startup is taken for a damaged one, as in 5.3.0+nikque.14.
+- Don't use the libedax of nikque.27 or later with edax_runner 5.3.0+nikque.14 or earlier: when `book.dat` can't be opened at startup, the book is kept, but the older edax_runner learns, can't save the book, and ends with an error (exit code 255) after retrying for about 30 seconds, leaving `data/book.dat.saving`.
+- Apart from a book file that can't be opened at startup, the libedax functions that edax_runner uses and what they do, `eval.dat` and the settings of `config.ini` are the same as in nikque.26 (5.3.0+nikque.14). `learning_list.txt` is read twice for each line learned (to take the line out, and to check it before it is rewritten).
+
+**Not checked**: speed and memory; running on real Linux and macOS machines.
+
+[Tests and measurements](docs/validation/changelog.en.md#530nikque15)
+
+---
 ## 5.3.0+nikque.14
 
 Updates the bundled libedax to Edax 4.5.5 nikque.26, so that its new function `edax_book_deviate_export` can be used. Tag `v5.3.0-nikque.14`; libedax: [Edax 4.5.5 nikque.26](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.26).

@@ -95,7 +95,7 @@ start ./edax_runner.exe
 
 ### 2. CPU に合わせたライブラリ
 
-`resources/dll/`（と Release の ZIP）に入っているのは、[Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX) の libedax です。**元の libedax の93個の関数がすべて使えます**（名前・引数・データの並びも同じ）。さらに、`edax_book_deviate2`・`edax_book_deviate3`・`edax_book_store_games`・`edax_book_store_tasks`・`libedax_cpu_level` などの関数を追加しています。Edax 4.5.5 nikque.26（5.3.0+nikque.14）からは `edax_book_deviate_export`（`book deviate`・`deviate2`・`deviate3` がたどる進行を、book を広げずにテキストファイルに書き出す）も使えます。追加した関数の一覧は [Edax の説明書の 12 章](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/ja/12-integration.md) にあります。edax_runner 自身が使うのは、そのうちの一部だけです。
+`resources/dll/`（と Release の ZIP）に入っているのは、[Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX) の libedax です。**元の libedax の93個の関数がすべて使えます**（名前・引数・データの並びも同じ）。さらに、`edax_book_deviate2`・`edax_book_deviate3`・`edax_book_store_games`・`edax_book_store_tasks`・`libedax_cpu_level` などの関数を追加しています。Edax 4.5.5 nikque.26（5.3.0+nikque.14）からは `edax_book_deviate_export`（`book deviate`・`deviate2`・`deviate3` がたどる進行を、book を広げずにテキストファイルに書き出す）も使えます。nikque.27（5.3.0+nikque.15）からは `edax_book_file_status`（起動のときに book のファイルを読めたか・開けたかを返す。edax_runner も使います）も使えます。追加した関数の一覧は [Edax の説明書の 12 章](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/ja/12-integration.md) にあります。edax_runner 自身が使うのは、そのうちの一部だけです。
 
 libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お使いの CPU が動かせる中で最も速いものを使います（Windows と Linux。Mac の `libedax.universal.dylib` は、Apple silicon と Intel の両用です）。
 
@@ -155,7 +155,7 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 - `learning_list.txt` の処理を速くし、メモリも少なくしました（バイト列のまま扱います。1行学習するごとに、行を取り出すときと、書き換える前に変わっていないかを確かめるときの2回読みます）。
 - `book.dat` を保存できないとき（ほかのプログラムが `book.dat` を開いている、など）は、1秒おきに30回まで保存をやり直します。それでも保存できなければ、`learning_list.txt` を変えずに止まります（5.3.0+nikque.3 から。それまでは、保存できていなくても学習済みとして行を消していました）。
 - 起動のときに `book.dat` を読めなかった（壊れている・途中で切れている）ときは、学習した book で置き換える前に `data/book.dat.damaged` として残します。残せなければ、`learning_list.txt` を変えずに止まります（5.3.0+nikque.10 から。Edax 4.5.5 nikque.16 以降の libedax で）。
-- 起動のときに `book.dat` を開けなかった（ほかのプログラムが共有なしで開いていた、など）ときは、libedax が 2 秒ほど待って開き直します。それでも開けなければ、edax_runner は学習を始めずに止まります。`book.dat` と `learning_list.txt` は変えません。時間をおいて起動し直してください（関数 `edax_book_file_status` を持つ libedax で。それより前の libedax では、壊れた book と同じに扱われ、空の book に学習を始めて、元の `book.dat` を `.damaged` に移していました）。
+- 起動のときに `book.dat` を開けなかった（ほかのプログラムが共有なしで開いていた、など）ときは、libedax が 2 秒ほど待って開き直します。それでも開けなければ、edax_runner は学習を始めずに止まります。`book.dat` と `learning_list.txt` は変えません。時間をおいて起動し直してください（5.3.0+nikque.15 から。関数 `edax_book_file_status` を持つ Edax 4.5.5 nikque.27 以降の libedax で。それより前の libedax では、壊れた book と同じに扱われ、空の book に学習を始めて、元の `book.dat` を `.damaged` に移していました）。
 - 同じフォルダーで 2 つ目の edax_runner を起動すると、何もせずに止まります（動いている間、フォルダーの `edax_runner.lock` をつかみます。5.3.0+nikque.10 から）。
 - edax_runner を強制終了しても、`book.dat`・`learning_list.txt`・`learned_log.txt` は壊れません。学習の途中だった行（同時に学習していた棋譜は、その1組）は、次に起動したときに最初から学習します。book を保存した直後（`learning_list.txt` を書き換える前）に止めた場合は、その行（組）をもう一度学習し、`learned_log.txt` に2回載ることがあります。
 
@@ -163,6 +163,7 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 
 | edax_runner | Edax | |
 | :-- | :-- | :-- |
+| [5.3.0+nikque.15](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.15) | [4.5.5 nikque.27](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.27) | 不具合の直し（起動のときに開けない book、学習リスト）と libedax の更新（`edax_book_file_status`） |
 | [5.3.0+nikque.14](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.14) | [4.5.5 nikque.26](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.26) | libedax の更新（新しい関数 `edax_book_deviate_export`） |
 | [5.3.0+nikque.13](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.13) | [4.5.5 nikque.25](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.25) | libedax の更新 |
 | [5.3.0+nikque.12](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.12) | [4.5.5 nikque.23](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.23) | libedax の更新だけ（edax_runner が使う機能の処理は同じ） |

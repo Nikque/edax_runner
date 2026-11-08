@@ -4,6 +4,16 @@
 
 The tests and measurements done for the versions of this fork, moved unchanged from [CHANGELOG.md](../../CHANGELOG.md). What changed in each version is in [CHANGELOG.md](../../CHANGELOG.md).
 
+## 5.3.0+nikque.15
+
+- The seven libraries match the published nikque.27 ZIP (taken again from the release and checked against its digest and SHA256SUMS). No build folder names were found. Sizes: the Windows DLLs +1,536 to +3,584 bytes, the Linux libraries 0 to +8,192 bytes, the macOS library +480 bytes. `bin/config.ini` of Edax is the same as in nikque.26, and `resources/data/eval.dat` is the same as `bin/data/eval.dat` of nikque.27.
+- On Windows (logical CPUs 16 to 19), Dart format and analysis passed and 38 tests passed. `edax_runner.exe` was built from this source with `dart compile exe`, as in the CI.
+- Against the published 5.3.0+nikque.14 (its executable, libraries and configuration), with the new executable, the Windows libraries of nikque.27 and the same `config.ini`: all 10 old/new comparisons exited 0, and had identical learning lists and logs and the same numbers of errors, warnings and book saves in the output; eight books matched. The other two (the lists `base` and BOM/CRLF, each with a line of `book-randomness` 4, one thread) differ by the random choice: with `book-seed` fixed to 1 to 6, the canonical books of old and new matched for all six seeds of both lists (12 pairs).
+- A truncated book (a test book cut at 40,000 bytes) was kept as `data/book.dat.damaged` (the same bytes) and the learned book saved; a concurrent second startup was rejected (exit 1) while the first learned 24 lines; startup after normal and forced termination succeeded.
+- A test book held without sharing for the first 5 seconds of the startup: edax_runner stopped with an error (exit 1) without learning; `book.dat` and `learning_list.txt` were unchanged, with no `.damaged`. Held for 1 second (libedax waited and opened it again) or not held: it learned as usual, and the canonical books were the same. The same with `libedax-x64.dll` only and with the three Windows DLLs (`-v4` chosen). For reference, the published 5.3.0+nikque.14 executable with the libedax of nikque.27 and the book held 5 seconds kept the book and the list, but learned, could not save the book and ended with exit 255 after 31 seconds, leaving `data/book.dat.saving`.
+- A list with CR-only line ends (two lines, `exit`, one line): the two lines were learned and edax_runner stopped at `exit`, leaving the last line in the list; 5.3.0+nikque.14 skipped the whole list as one line of unknown format.
+- Small test data, levels 1 to 8, and at most two logical CPUs for each run. Linux and macOS execution, speed and memory were not tested. An edit of `learning_list.txt` saved while it is rewritten was tested by the Dart tests only; the first line taken after the book is loaded and the book not saved after a group with no game learned were not tried end to end.
+
 ## 5.3.0+nikque.14
 
 - The seven libraries match the published nikque.26 ZIP (taken again after the release and checked against its SHA256SUMS). No build folder names were found. Sizes: the Windows DLLs +17,920 to +19,456 bytes, the Linux libraries +8,192 to +12,288 bytes, the macOS library +33,024 bytes (the code of the export).
