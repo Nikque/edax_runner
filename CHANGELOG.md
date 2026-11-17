@@ -4,6 +4,24 @@
 
 Versions of this fork. The history of the original edax_runner (5.3.0 and earlier) follows below. The tests and measurements are in [docs/validation/changelog.en.md](docs/validation/changelog.en.md).
 
+## 5.3.0+nikque.16
+
+The bundled libedax is updated to Edax 4.5.5 nikque.29 (the libedax of nikque.28 has the fix of the exact search; that of nikque.29 lets the book commands go on from a saved book). edax_runner itself is not changed. Tag `v5.3.0-nikque.16`; libedax: [Edax 4.5.5 nikque.29](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.29).
+
+**Changes**
+
+- libedax is now that of Edax 4.5.5 nikque.29 (Edax release notes: [nikque.29](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.md#v455-nikque29)). Through nikque.28, an exact search at level 60 from 17 empties on no longer gives a rare wrong score. With nikque.29, `book correct` and `book leaf recalculate` (`edax_book_correct`, `edax_book_leaf_recalculate*`) go on from a book saved before they ended, as `book learn` with a file of games does, and `book deepen` (`edax_book_deepen`) works. edax_runner learns with `book store` and does not call these commands.
+
+**Compatibility**
+
+- The libedax functions that edax_runner uses and what they do, `eval.dat` and the settings of `config.ini` are the same as in nikque.27 (5.3.0+nikque.15).
+- A book saved by libedax before `book correct` or `book leaf recalculate` ended holds progress marks, and the libedax of nikque.28 and earlier (edax_runner 5.3.0+nikque.15 and earlier) reads it as a damaged book. edax_runner does not make such books.
+
+**Not checked**: speed and memory; running on real Linux and macOS machines.
+
+[Tests and measurements](docs/validation/changelog.en.md#530nikque16)
+
+---
 ## 5.3.0+nikque.15
 
 Fixes of edax_runner (a `book.dat` that could not be opened at startup, and `learning_list.txt`), with the bundled libedax updated to Edax 4.5.5 nikque.27. Tag `v5.3.0-nikque.15`; libedax: [Edax 4.5.5 nikque.27](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.27). This edax_runner and the libedax of nikque.27 or later go together (see **Compatibility**).

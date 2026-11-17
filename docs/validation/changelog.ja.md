@@ -4,6 +4,13 @@
 
 この fork の各版で行ったテストと実測の記録です。[CHANGELOG.ja.md](../../CHANGELOG.ja.md) から、そのまま移しました。各版で何が変わったかは [CHANGELOG.ja.md](../../CHANGELOG.ja.md) にあります。
 
+## 5.3.0+nikque.16
+
+- ライブラリ７個は、Release から取り直して digest と SHA256SUMS と照らした nikque.29 の ZIP と一致しました（入れ替える前は、どれも nikque.27 の ZIP のもの）。ビルドしたときのフォルダー名は見つかりませんでした。大きさは Windows の DLL が各 +512 バイト、Linux のライブラリが 0〜+4,096 バイト、macOS のライブラリが +48 バイト。`bin/config.ini` は nikque.27 と nikque.29 で同じ、`resources/data/eval.dat` は nikque.29 の `bin/data/eval.dat` と同じです。
+- Windows（論理 CPU 28〜31）で Dart の整形・静的解析と38テストが通りました。`edax_runner.exe` は、CI と同じく `dart compile exe` でこのソースから作りました。
+- 公開済み 5.3.0+nikque.15（その実行ファイル・ライブラリ・設定）と、新しい実行ファイル・nikque.29 の Windows のライブラリ・同じ `config.ini` を比べました：10組（５つのリスト、１スレッドと２スレッド）はすべて終了 0 で、学習リストと記録が同じ、book も１組（２スレッド・`book-store-tasks auto` の `games`）のほか同じでした。その組の book は、どちらの版でも実行ごとに変わります（流し直すと、１回目の旧の book と２回目の新の book が同じでした）。
+- 小さい試験データ、１回あたり最大２論理 CPU。Linux・macOS での実行、速さとメモリは未確認です。
+
 ## 5.3.0+nikque.15
 
 - ライブラリ７個は、Release から取り直して digest と SHA256SUMS と照らした nikque.27 の ZIP と一致し、ビルドしたときのフォルダー名は見つかりませんでした。大きさは Windows の DLL が +1,536〜+3,584 バイト、Linux が 0〜+8,192 バイト、macOS が +480 バイトです。Edax の `bin/config.ini` は nikque.26 と同じ、`resources/data/eval.dat` は nikque.27 の `bin/data/eval.dat` と同じです。

@@ -163,6 +163,7 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 
 | edax_runner | Edax | |
 | :-- | :-- | :-- |
+| [5.3.0+nikque.16](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.16) | [4.5.5 nikque.29](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.29) | libedax の更新（完全読みの直し、book のコマンドを途中から続けられる） |
 | [5.3.0+nikque.15](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.15) | [4.5.5 nikque.27](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.27) | 不具合の直し（起動のときに開けない book、学習リスト）と libedax の更新（`edax_book_file_status`） |
 | [5.3.0+nikque.14](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.14) | [4.5.5 nikque.26](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.26) | libedax の更新（新しい関数 `edax_book_deviate_export`） |
 | [5.3.0+nikque.13](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.13) | [4.5.5 nikque.25](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.25) | libedax の更新 |

@@ -4,6 +4,13 @@
 
 The tests and measurements done for the versions of this fork, moved unchanged from [CHANGELOG.md](../../CHANGELOG.md). What changed in each version is in [CHANGELOG.md](../../CHANGELOG.md).
 
+## 5.3.0+nikque.16
+
+- The seven libraries match the published nikque.29 ZIP (taken again from the release and checked against its digest and SHA256SUMS); before the change, each was that of the nikque.27 ZIP. No build folder names were found. Sizes: the Windows DLLs +512 bytes each, the Linux libraries 0 to +4,096 bytes, the macOS library +48 bytes. `bin/config.ini` is the same in nikque.27 and nikque.29, and `resources/data/eval.dat` is the `bin/data/eval.dat` of nikque.29.
+- On Windows (logical CPUs 28 to 31), Dart format and analysis passed and 38 tests passed. `edax_runner.exe` was built from this source with `dart compile exe`, as in the CI.
+- Against the published 5.3.0+nikque.15 (its executable, libraries and configuration), with the new executable, the Windows libraries of nikque.29 and the same `config.ini`: the 10 runs (5 lists, 1 thread and 2 threads) all exited 0 with the same learning lists and logs, and the same books except one 2-thread run (`games`, `book-store-tasks auto`); its book changes from run to run with either version (run again, the old book of the first run was the same as the new book of the second).
+- Small test data, at most two logical CPUs for each run. Linux and macOS execution, speed and memory were not tested.
+
 ## 5.3.0+nikque.15
 
 - The seven libraries match the published nikque.27 ZIP (taken again from the release and checked against its digest and SHA256SUMS). No build folder names were found. Sizes: the Windows DLLs +1,536 to +3,584 bytes, the Linux libraries 0 to +8,192 bytes, the macOS library +480 bytes. `bin/config.ini` of Edax is the same as in nikque.26, and `resources/data/eval.dat` is the same as `bin/data/eval.dat` of nikque.27.

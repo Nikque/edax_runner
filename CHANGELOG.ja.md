@@ -4,6 +4,24 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。テストと実測の記録は [docs/validation/changelog.ja.md](docs/validation/changelog.ja.md) にあります。
 
+## 5.3.0+nikque.16
+
+同梱の libedax を Edax 4.5.5 nikque.29 に更新しました（nikque.28 の libedax で完全読みの不具合が直り、nikque.29 の libedax で book のコマンドを途中から続けられるようになりました）。edax_runner そのものは変えていません。タグは `v5.3.0-nikque.16`、libedax：[Edax 4.5.5 nikque.29](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.29)。
+
+**変更**
+
+- libedax を Edax 4.5.5 nikque.29 のものにしました（Edax の変更点：[nikque.29](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque29)）。nikque.28 までの直しで、空き 17 マス以上の level 60 の完全読みが、まれに評価値を誤ることがなくなりました。nikque.29 で、`book correct`・`book leaf recalculate`（`edax_book_correct`・`edax_book_leaf_recalculate*`）が、棋譜のファイルからの `book learn` と同じく途中で保存された book から続けられ、`book deepen`（`edax_book_deepen`）が働くようになりました。edax_runner は `book store` で学習し、これらのコマンドは使いません。
+
+**互換性**
+
+- edax_runner が使う libedax の関数とその動き、`eval.dat`、`config.ini` の設定は nikque.27（5.3.0+nikque.15）と同じです。
+- libedax が `book correct`・`book leaf recalculate` の終わる前に保存した book には途中の印があり、nikque.28 以前の libedax（edax_runner 5.3.0+nikque.15 以前）では壊れた book として読まれます。edax_runner はこのような book を作りません。
+
+**未確認**：速さとメモリ、Linux・macOS の実機での実行。
+
+[検証記録](docs/validation/changelog.ja.md#530nikque16)
+
+---
 ## 5.3.0+nikque.15
 
 edax_runner の不具合（起動のときに開けなかった `book.dat`、`learning_list.txt`）を直し、同梱の libedax を Edax 4.5.5 nikque.27 に更新しました。タグは `v5.3.0-nikque.15`、libedax：[Edax 4.5.5 nikque.27](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.27)。この edax_runner と nikque.27 以降の libedax は組にして使います（**互換性**を見てください）。
