@@ -8,24 +8,24 @@
 <img src="https://github.com/Nikque/edax_runner/blob/nikque-fixes/resources/logo.png?raw=true" alt="edax-runner" />
 </p>
 
-tiny tool for [edax-reversi](https://github.com/Nikque/edax-reversi-AVX) **auto** learning.
+A tiny tool that makes [edax-reversi](https://github.com/Nikque/edax-reversi-AVX) learn **automatically**.
 
-- you can write learning list as simple format txt.
-  - you can also check the logs.
-- Mac, Windows, Linux are supported.
+- You write what to learn in a text file with a simple format.
+  - You can check in the log what has been learned.
+- It runs on Mac, Windows and Linux.
 
-This is a fork of [sensuikan1973/edax_runner](https://github.com/sensuikan1973/edax_runner) which learns with [Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX). See [What this fork changes](#what-this-fork-changes).
+This is a fork of [sensuikan1973/edax_runner](https://github.com/sensuikan1973/edax_runner), and it learns with [Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX). For the differences from the original edax_runner, see [What this fork changes](#what-this-fork-changes).
 
 ![demo](https://github.com/Nikque/edax_runner/blob/nikque-fixes/resources/demo.gif)
 
 ## Usage
 
-1. download the Asset from the [latest Release](https://github.com/Nikque/edax_runner/releases/latest).
-2. edit `learning_list.txt` which you want to let edax learn.
-3. edit `config.ini` which you like.
-4. [optional] add your `book.dat` to `data/book.dat`.
-5. run edax_runner.
-6. you can check what runner has already learned by checking `learned_log.txt`.
+1. Download the file for your OS from the [latest Release](https://github.com/Nikque/edax_runner/releases/latest).
+2. Write what you want edax to learn in `learning_list.txt`.
+3. Edit `config.ini` to your liking.
+4. (Optional) Put your own `book.dat` at `data/book.dat`.
+5. Run edax_runner.
+6. Check what has been learned in `learned_log.txt`.
 
 <details><summary>Mac</summary>
 
@@ -53,7 +53,7 @@ start ./edax_runner.exe
 
 ### How to write learning_list.txt ?
 
-There are **only 5 rules**. Example is [here](https://github.com/Nikque/edax_runner/blob/nikque-fixes/resources/learning_list.txt).
+There are **only 5 rules**. An example is [here](https://github.com/Nikque/edax_runner/blob/nikque-fixes/resources/learning_list.txt).
 
 | purpose                        | format                                 | example                |
 | :----------------------------- | :------------------------------------- | :--------------------- |
@@ -63,13 +63,17 @@ There are **only 5 rules**. Example is [here](https://github.com/Nikque/edax_run
 | `book fix` command             | `fix`                                  | `fix`                  |
 | stop edax_runner               | `exit`                                 | `exit`                 |
 
-- NOTE
-  - The default value of `book-randomness` is `0`. So, you can also write `F5F6F7` which is equal to `0,F5F6F7`.
-  - What's `book deviate` ?: See [edax document](https://sensuikan1973.github.io/edax-reversi/book_8c.html#ae9ee489a468274fd83808c53da0418c9), [Choirokoitia document](https://choi.lavox.net/edax/start)
+- Notes
+  - The default value of `book-randomness` is `0`. `F5F6F7` is the same as `0,F5F6F7`.
+  - For `book deviate`, see the [edax document](https://sensuikan1973.github.io/edax-reversi/book_8c.html#ae9ee489a468274fd83808c53da0418c9) and the [Choirokoitia document](https://choi.lavox.net/edax/start).
   - Blank lines are ignored.
-  - A line which can't be learned (unknown format, illegal move) is skipped. It's recorded in `learned_log.txt` as a comment like `// [edax_runner] skipped (illegal move): F5F5`.
-  - You can edit `learning_list.txt` while edax_runner is running. edax_runner reads it again whenever it has finished learning a line (or a group of games learned at the same time). For example, you can stop edax_runner after the current line (or group) by adding `exit` to the head.
-  - If `learning_list.txt` is saved while edax_runner rewrites it to remove the learned line, edax_runner reads it again and removes the line from what was saved. If it keeps being saved for about a minute, edax_runner stops without rewriting `learning_list.txt` (the learned line is recorded in `learned_log.txt`, and is learned again at the next run).
+  - A line that can't be learned (unknown format, illegal move) is skipped. It's recorded in `learned_log.txt` as a comment like `// [edax_runner] skipped (illegal move): F5F5`.
+  - You can edit `learning_list.txt` while edax_runner is running.
+    - edax_runner reads `learning_list.txt` again each time it has finished learning a line. For games learned at the same time, it reads it again after each group.
+    - For example, if you add `exit` at the top, edax_runner stops after the current line (or group).
+  - `learning_list.txt` may be saved while edax_runner rewrites it to remove the learned line. Then edax_runner reads it again and removes the line from what was saved.
+    - If it keeps being saved for about a minute, edax_runner stops without rewriting `learning_list.txt`.
+    - The learned line is recorded in `learned_log.txt`, and is learned again at the next run.
   - The comments can be written in any encoding except UTF-16.
 
 ## What this fork changes
@@ -89,15 +93,23 @@ The way to use it and the format of `learning_list.txt` are the same.
 
 ### 1. Edax 4.5.5 (nikque) instead of Edax 4.4
 
-- edax is [Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX). Its `libedax` has the same functions as [the original one](https://github.com/sensuikan1973/edax-reversi), so [libedax4dart](https://pub.dev/packages/libedax4dart) is used as it is.
-- It searches faster with less memory, and the scores can differ from Edax 4.4 at the same level.
-- The book file is compatible. (Edax 4.4 can also read the book saved by this version)
+- edax is [Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX).
+- Its `libedax` has the same functions as [the original one](https://github.com/sensuikan1973/edax-reversi). So [libedax4dart](https://pub.dev/packages/libedax4dart) is used as it is.
+- It searches faster and uses less memory.
+- At the same level, the scores can differ from those of Edax 4.4.
+- The book file is compatible: Edax 4.4 can also read a book saved by this version.
 
 ### 2. A library for each level of CPU
 
-`resources/dll/` (and the Release archives) hold the libedax of [Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX): **all the 93 functions of the original libedax are available**, with the same names, arguments and data layout, and functions of its own, such as `edax_book_deviate2`, `edax_book_deviate3`, `edax_book_store_games`, `edax_book_store_tasks`, `libedax_cpu_level` and, since Edax 4.5.5 nikque.26 (5.3.0+nikque.14), `edax_book_deviate_export` (it writes the lines that `book deviate`, `deviate2` or `deviate3` walks to a text file, without expanding the book) and, since nikque.27 (5.3.0+nikque.15), `edax_book_file_status` (it tells whether the book file could be read and opened at the start; edax_runner uses it). The added functions are listed in [chapter 12 of the Edax manual](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/en/12-integration.md). edax_runner itself only uses a few of them.
+`resources/dll/` and the Release ZIPs hold the libedax of [Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX).
 
-libedax is built for several levels of CPU, and edax_runner uses the fastest one which your CPU can run. (Windows, Linux; on Mac, `libedax.universal.dylib` is for Apple silicon and Intel)
+- All the 93 functions of the original libedax are available, with the same names, arguments and data layout.
+- It also has functions of its own, such as `edax_book_deviate2`, `edax_book_deviate3`, `edax_book_store_games`, `edax_book_store_tasks` and `libedax_cpu_level`.
+- Since Edax 4.5.5 nikque.26 (5.3.0+nikque.14), `edax_book_deviate_export` is also available. It writes the lines that `book deviate`, `deviate2` or `deviate3` follows to a text file, without expanding the book.
+- Since nikque.27 (5.3.0+nikque.15), `edax_book_file_status` is also available. It tells whether the book file could be read and opened at startup. edax_runner uses it too.
+- The added functions are listed in [chapter 12 of the Edax manual](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/en/12-integration.md). edax_runner itself only uses a few of them.
+
+libedax is built for several levels of CPU. On Windows and Linux, edax_runner uses the fastest one that your CPU can run. On Mac, `libedax.universal.dylib` is for both Apple silicon and Intel.
 
 | CPU                  | Windows              | Linux           |
 | :------------------- | :------------------- | :-------------- |
@@ -105,23 +117,37 @@ libedax is built for several levels of CPU, and edax_runner uses the fastest one
 | x86-64-v3 (AVX2)     | `libedax-x64-v3.dll` | `libedax-v3.so` |
 | x86-64-v4 (AVX-512)  | `libedax-x64-v4.dll` | `libedax-v4.so` |
 
-edax_runner prints the one which it uses, like `[edax_runner] use "libedax-x64-v4.dll".`
+edax_runner prints the one it uses, like `[edax_runner] use "libedax-x64-v4.dll".`
 
-**Using these libraries in another program**: they are not tied to edax_runner. Any program written for libedax (with [libedax4dart](https://pub.dev/packages/libedax4dart), or calling the functions of `libedax.h` from C, Python, C#, ...) can use them: put the library and `data/eval.dat` next to the program. The header (`src/libedax.h`), a short example (`tests/libedax_example.c`), the differences from the original libedax and the libraries for Android are in [section 12.2 "The library (libedax)" of the Edax 4.5.5 (nikque) manual](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/en/12-integration.md); the libraries are also in the ZIP of its [Releases](https://github.com/Nikque/edax-reversi-AVX/releases).
+**Using these libraries in another program**
+
+- They are not tied to edax_runner.
+- Any program written for libedax can use them: put the library and `data/eval.dat` in the same folder as the program. This includes programs using [libedax4dart](https://pub.dev/packages/libedax4dart), and programs calling the functions of `libedax.h` from C, Python, C# and so on.
+- See [section 12.2 "The library (libedax)" of the Edax 4.5.5 (nikque) manual](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/en/12-integration.md) for the header (`src/libedax.h`), a short example (`tests/libedax_example.c`), the differences from the original libedax, and the libraries for Android.
+- The libraries are also in the ZIPs of the Edax 4.5.5 (nikque) [Releases](https://github.com/Nikque/edax-reversi-AVX/releases).
 
 ### 3. Settings in config.ini
 
-- The settings are in `config.ini`, which is the one of Edax 4.5.5 (nikque). See the comments in it.
-- By default, the level is 18, all the logical CPUs are used (`n-tasks = auto`), and the depth of the book is the one of your `book.dat` (`book-depth = auto`).
-- `edax.ini` is still read if it exists, but `config.ini` is prioritized.
+- The settings are in `config.ini`. It is the same file as the `config.ini` of Edax 4.5.5 (nikque). The comments in the file explain each setting.
+- The default settings are:
+  - The level is 18.
+  - All the logical CPUs are used (`n-tasks = auto`).
+  - The depth of the book is that of your `book.dat` (`book-depth = auto`).
+- `edax.ini` is still read if it exists, but `config.ini` takes priority.
 
 ### 4. Several games are learned at the same time
 
-Several games are learned at the same time, with `book-store-tasks` of `config.ini`. (`auto` by default: as many games as `n-tasks`)
+As many games as `book-store-tasks` of `config.ini` are learned at the same time. The default is `auto`: as many games as `n-tasks`.
 
-- edax_runner takes the next lines of edax vs edax (up to that number) from `learning_list.txt`, and libedax plays them at the same time, then searches the positions of all these games at the same time and stores them. The book is linked, negamaxed and saved once for these games.
-- With `book-store-tasks = 1`, a game is learned after the other, as the original edax_runner does.
-- One edax_runner uses all the CPUs, so there is no need to run several edax_runner and merge their books. Measured with 128 games at level 18 on a PC with 32 logical CPUs:
+Learning goes as follows.
+
+1. edax_runner takes the next lines of edax vs edax from `learning_list.txt`, up to that number.
+2. libedax plays these games at the same time.
+3. libedax searches the positions of all these games at the same time, and stores them in the book.
+4. The book is linked, negamaxed and saved once for the group.
+
+- With `book-store-tasks = 1`, games are learned one at a time, as in the original edax_runner.
+- One edax_runner uses all the CPUs. There is no longer any need to run several edax_runner and merge their books later. Measured with 128 games at level 18 on a PC with 32 logical CPUs:
 
   | | time |
   | :-- | :-- |
@@ -130,10 +156,15 @@ Several games are learned at the same time, with `book-store-tasks` of `config.i
   | 8 edax_runner at the same time, `n-tasks = 4`, then merging their books | 42 + 2 seconds |
   | 16 edax_runner at the same time, `n-tasks = 2`, then merging their books | 35 + 3 seconds |
 
-- The book is not exactly the same as the one learned with `book-store-tasks = 1`: how much it differs is in [section 7.2 of the Edax 4.5.5 (nikque) manual](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/en/07-book-learning.md) ("Learning several games in parallel: book-store-tasks"), and the measurements are in [the Edax test records (nikque.7)](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/docs/validation/nikque.en.md#v455-nikque7).
-- The games of a group are played with the book as it was before the group, and the moves of each game aren't printed.
-- `book deviate`, `fix` and a single line of edax vs edax are learned one by one. (the positions of a single game are still searched at the same time: 30 single games at level 18 took 18 seconds, against 35 seconds with `book-store-tasks = 1`, with the same commands typed in edax)
-- If you still run several edax_runner at the same time, set `n-tasks` so that they don't use more threads than your CPU has.
+- The book is not exactly the same as the one learned with `book-store-tasks = 1`.
+  - How much it differs is in [section 7.2 of the Edax 4.5.5 (nikque) manual](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/en/07-book-learning.md) ("Learning several games in parallel: book-store-tasks").
+  - The details of the measurements are in [the Edax test records (nikque.7)](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/docs/validation/nikque.en.md#v455-nikque7).
+- The games of a group are played with the book as it was before the group.
+- The moves of each game aren't printed.
+- `book deviate`, `fix` and a single line of edax vs edax are learned one by one.
+  - Even for a single game, its positions are searched at the same time.
+  - 30 single games at level 18 took 18 seconds, against 35 seconds with `book-store-tasks = 1`. These were measured by entering the same commands in edax.
+- If you still run several edax_runner at the same time, set `n-tasks` so that the total number of threads doesn't exceed the number of CPUs.
 
 ### 5. Fixes of learning_list.txt and of saving
 
@@ -152,12 +183,24 @@ Other changes:
 
 - `[0 0]F5F6`, `[ 0 0 ] F5F6` and `2, F5F6` are accepted.
 - The directory of the executable is used if `learning_list.txt` isn't in the current directory.
-- `learning_list.txt` is handled faster with less memory (it's handled as bytes. It's read twice per line to learn: to take the line out, and to check that it hasn't been changed before it is rewritten).
-- If `book.dat` can't be saved (e.g. another program opens `book.dat`), saving is retried every second, up to 30 times. If it still can't be saved, edax_runner stops without changing `learning_list.txt`. (since 5.3.0+nikque.3; before, the lines were removed as learned even if the book wasn't saved)
-- If `book.dat` could not be read at startup (damaged, truncated), it is kept as `data/book.dat.damaged` before the learned book replaces it. If it cannot be kept, edax_runner stops without changing `learning_list.txt`. (since 5.3.0+nikque.10, with libedax of Edax 4.5.5 nikque.16 or later)
-- If `book.dat` could not be opened at startup (another program had it open without sharing, and so on), libedax waits about 2 seconds and tries again. If it still cannot be opened, edax_runner stops without learning, and changes neither `book.dat` nor `learning_list.txt`: run it again later. (since 5.3.0+nikque.15, with the libedax of Edax 4.5.5 nikque.27 or later, which has the function `edax_book_file_status`; an older libedax takes such a file for a damaged one: edax_runner learned into an empty book, and moved the original `book.dat` to `.damaged`)
-- A second edax_runner started in the same folder stops without doing anything (it locks `edax_runner.lock` of the folder while it runs). (since 5.3.0+nikque.10)
-- `book.dat`, `learning_list.txt` and `learned_log.txt` aren't broken even if edax_runner is killed. The line being learned (or the group of games being learned at the same time) is learned from the beginning at the next run. If edax_runner is killed right after saving the book (before rewriting `learning_list.txt`), the line (or group) is learned once more, and can be recorded twice in `learned_log.txt`.
+- `learning_list.txt` is handled faster and with less memory.
+  - `learning_list.txt` is handled as bytes.
+  - It's read twice for each line learned: to take the line out, and to check that it hasn't changed before it is rewritten.
+- If `book.dat` can't be saved, saving is retried every second, up to 30 times. For example, another program may have `book.dat` open.
+  - If it still can't be saved, edax_runner stops without changing `learning_list.txt`.
+  - Since 5.3.0+nikque.3. Before, the lines were removed as learned even if the book wasn't saved.
+- If `book.dat` could not be read at startup (damaged, truncated), it is kept as `data/book.dat.damaged` before the learned book replaces it.
+  - If it cannot be kept, edax_runner stops without changing `learning_list.txt`.
+  - Since 5.3.0+nikque.10, with the libedax of Edax 4.5.5 nikque.16 or later.
+- If `book.dat` could not be opened at startup (another program had it open without sharing, and so on), libedax waits about 2 seconds and tries again.
+  - If it still cannot be opened, edax_runner stops without learning. It changes neither `book.dat` nor `learning_list.txt`. Run it again later.
+  - Since 5.3.0+nikque.15, with the libedax of Edax 4.5.5 nikque.27 or later, which has the function `edax_book_file_status`.
+  - An older libedax took such a file for a damaged one. edax_runner then learned into an empty book, and moved the original `book.dat` to `.damaged`.
+- A second edax_runner started in the same folder stops without doing anything. Since 5.3.0+nikque.10.
+  - While it runs, edax_runner locks `edax_runner.lock` in the folder.
+- `book.dat`, `learning_list.txt` and `learned_log.txt` aren't broken even if edax_runner is killed.
+  - The line being learned is learned from the beginning at the next run. For games learned at the same time, the whole group is learned again from the beginning.
+  - If edax_runner is killed right after saving the book, before rewriting `learning_list.txt`, the line (or group) is learned once more. So it can be recorded twice in `learned_log.txt`.
 
 ### Versions
 

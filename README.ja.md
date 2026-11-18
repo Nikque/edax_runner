@@ -68,8 +68,12 @@ start ./edax_runner.exe
   - `book deviate` については、[edax のドキュメント](https://sensuikan1973.github.io/edax-reversi/book_8c.html#ae9ee489a468274fd83808c53da0418c9)と [Choirokoitia のドキュメント](https://choi.lavox.net/edax/start)を見てください。
   - 空行は無視します。
   - 学習できない行（書式が違う、打てない手がある）は飛ばします。`learned_log.txt` には `// [edax_runner] skipped (illegal move): F5F5` のようなコメントとして記録します。
-  - edax_runner の実行中に `learning_list.txt` を書き換えてもかまいません。edax_runner は、1行（同時に学習する棋譜は、その1組）の学習が終わるたびに読み直します。たとえば先頭に `exit` を足すと、いまの行（組）の学習が終わったところで止まります。
-  - 学習した行を消して書き換えるときに、その間に保存された `learning_list.txt` があれば、読み直して、保存された中身から行を消します。1 分ほど保存が続いて落ち着かないときは、`learning_list.txt` を書き換えずに止まります（学習した行は `learned_log.txt` に記録してあり、次の起動でもう一度学習します）。
+  - edax_runner の実行中に `learning_list.txt` を書き換えてもかまいません。
+    - edax_runner は、1 行の学習が終わるたびに `learning_list.txt` を読み直します。同時に学習する棋譜は、その 1 組の学習が終わるたびです。
+    - たとえば先頭に `exit` を足すと、いまの行（組）の学習が終わったところで止まります。
+  - edax_runner が学習した行を消して `learning_list.txt` を書き換える間に、`learning_list.txt` が保存されることがあります。そのときは読み直して、保存された中身から行を消します。
+    - 1 分ほど保存が続いて落ち着かないときは、`learning_list.txt` を書き換えずに止まります。
+    - 学習した行は `learned_log.txt` に記録してあり、次の起動でもう一度学習します。
   - コメントの文字コードは、UTF-16 以外なら何でもかまいません。
 
 ## この fork で変えたこと
@@ -89,15 +93,23 @@ start ./edax_runner.exe
 
 ### 1. Edax 4.4 の代わりに Edax 4.5.5 (nikque)
 
-- edax は [Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX) です。その `libedax` は[元の libedax](https://github.com/sensuikan1973/edax-reversi) と同じ関数を持つので、[libedax4dart](https://pub.dev/packages/libedax4dart) はそのまま使っています。
-- 探索が速く、メモリが少なくなります。同じ level でも、評価値が Edax 4.4 と違うことがあります。
-- book のファイルは互換です（この版が保存した book を、Edax 4.4 も読めます）。
+- edax は [Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX) です。
+- その `libedax` は[元の libedax](https://github.com/sensuikan1973/edax-reversi) と同じ関数を持ちます。そのため、[libedax4dart](https://pub.dev/packages/libedax4dart) はそのまま使っています。
+- 探索が速く、メモリが少なくなります。
+- 同じ level でも、評価値が Edax 4.4 と違うことがあります。
+- book のファイルは互換です。この版が保存した book を、Edax 4.4 も読めます。
 
 ### 2. CPU に合わせたライブラリ
 
-`resources/dll/`（と Release の ZIP）に入っているのは、[Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX) の libedax です。**元の libedax の93個の関数がすべて使えます**（名前・引数・データの並びも同じ）。さらに、`edax_book_deviate2`・`edax_book_deviate3`・`edax_book_store_games`・`edax_book_store_tasks`・`libedax_cpu_level` などの関数を追加しています。Edax 4.5.5 nikque.26（5.3.0+nikque.14）からは `edax_book_deviate_export`（`book deviate`・`deviate2`・`deviate3` がたどる進行を、book を広げずにテキストファイルに書き出す）も使えます。nikque.27（5.3.0+nikque.15）からは `edax_book_file_status`（起動のときに book のファイルを読めたか・開けたかを返す。edax_runner も使います）も使えます。追加した関数の一覧は [Edax の説明書の 12 章](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/ja/12-integration.md) にあります。edax_runner 自身が使うのは、そのうちの一部だけです。
+`resources/dll/` と Release の ZIP に入っているのは、[Edax 4.5.5 (nikque)](https://github.com/Nikque/edax-reversi-AVX) の libedax です。
 
-libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お使いの CPU が動かせる中で最も速いものを使います（Windows と Linux。Mac の `libedax.universal.dylib` は、Apple silicon と Intel の両用です）。
+- 元の libedax の 93 個の関数が、すべて使えます。名前・引数・データの並びも同じです。
+- さらに、`edax_book_deviate2`・`edax_book_deviate3`・`edax_book_store_games`・`edax_book_store_tasks`・`libedax_cpu_level` などの関数を追加しています。
+- Edax 4.5.5 nikque.26（5.3.0+nikque.14）からは、`edax_book_deviate_export` も使えます。`book deviate`・`deviate2`・`deviate3` がたどる進行を、book を広げずにテキストファイルに書き出します。
+- nikque.27（5.3.0+nikque.15）からは、`edax_book_file_status` も使えます。起動のときに book のファイルを読めたか・開けたかを返します。edax_runner も使います。
+- 追加した関数の一覧は [Edax のマニュアルの 12 章](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/ja/12-integration.md) にあります。edax_runner 自身が使うのは、そのうちの一部だけです。
+
+libedax は、CPU の世代ごとにビルドしてあります。Windows と Linux では、edax_runner は、お使いの CPU が動かせる中で最も速いものを使います。Mac の `libedax.universal.dylib` は、Apple silicon と Intel の両用です。
 
 | CPU                  | Windows              | Linux           |
 | :------------------- | :------------------- | :-------------- |
@@ -107,21 +119,35 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 
 どれを使っているかは、`[edax_runner] use "libedax-x64-v4.dll".` のように表示します。
 
-**このライブラリをほかのソフトで使う場合**：ライブラリは edax_runner 専用ではありません。libedax 用に書かれたプログラム（[libedax4dart](https://pub.dev/packages/libedax4dart) を使うもの、C・Python・C# などから `libedax.h` の関数を呼ぶもの）なら、ライブラリと `data/eval.dat` をプログラムと同じフォルダに置けば使えます。ヘッダー（`src/libedax.h`）、短い使用例（`tests/libedax_example.c`）、元の libedax との違い、Android 用のライブラリについては、[Edax 4.5.5 (nikque) のマニュアル 12.2「ライブラリ（libedax）」](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/ja/12-integration.md)を見てください。ライブラリは、その [Releases](https://github.com/Nikque/edax-reversi-AVX/releases) の ZIP にも入っています。
+**このライブラリをほかのソフトで使う場合**
+
+- ライブラリは edax_runner 専用ではありません。
+- libedax 用に書かれたプログラムなら、ライブラリと `data/eval.dat` をプログラムと同じフォルダーに置けば使えます。[libedax4dart](https://pub.dev/packages/libedax4dart) を使うプログラムや、C・Python・C# などから `libedax.h` の関数を呼ぶプログラムです。
+- ヘッダー（`src/libedax.h`）、短い使用例（`tests/libedax_example.c`）、元の libedax との違い、Android 用のライブラリについては、[Edax 4.5.5 (nikque) のマニュアル 12.2「ライブラリ（libedax）」](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/ja/12-integration.md)を見てください。
+- ライブラリは、Edax 4.5.5 (nikque) の [Releases](https://github.com/Nikque/edax-reversi-AVX/releases) の ZIP にも入っています。
 
 ### 3. 設定は config.ini
 
 - 設定は `config.ini` に書きます。Edax 4.5.5 (nikque) の `config.ini` と同じものです。項目の説明は、ファイルの中のコメントにあります。
-- 既定では、level は18、論理 CPU を全部使い（`n-tasks = auto`）、book の深さは `book.dat` の値のままです（`book-depth = auto`）。
+- 既定の設定は次のとおりです。
+  - level は 18 です。
+  - 論理 CPU を全部使います（`n-tasks = auto`）。
+  - book の深さは `book.dat` の値のままです（`book-depth = auto`）。
 - `edax.ini` があればそれも読みますが、`config.ini` の設定が優先です。
 
 ### 4. 複数の棋譜を同時に学習
 
-`config.ini` の `book-store-tasks` の数だけ、棋譜を同時に学習します（既定は `auto`＝`n-tasks` と同じ数）。
+`config.ini` の `book-store-tasks` の数だけ、棋譜を同時に学習します。既定は `auto` で、`n-tasks` と同じ数です。
 
-- edax_runner は、`learning_list.txt` から「Edax 対 Edax」の行をその数まで取り出し、libedax がそれらを同時に対局し、全部の棋譜の局面を同時に探索して book に入れます。book の Link の張り直し・negamax・保存は、その組につき1回です。
-- `book-store-tasks = 1` にすると、元の edax_runner と同じく1局ずつ学習します。
-- edax_runner 1本で全部の CPU を使うので、edax_runner を何本も起動して後で book を merge する必要がなくなりました。論理 CPU 32 の PC で、棋譜128本を level 18 で学習した実測：
+学習は次の順に進みます。
+
+1. edax_runner は、`learning_list.txt` から「Edax 対 Edax」の行を、その数まで取り出します。
+2. libedax がそれらを同時に対局します。
+3. libedax が全部の棋譜の局面を同時に探索して、book に入れます。
+4. book の Link の張り直し・negamax・保存を、その組につき 1 回行います。
+
+- `book-store-tasks = 1` にすると、元の edax_runner と同じく 1 局ずつ学習します。
+- edax_runner 1 本で全部の CPU を使います。edax_runner を何本も起動して、後で book を merge する必要はなくなりました。論理 CPU 32 の PC で、棋譜 128 本を level 18 で学習した実測です。
 
   | | 時間 |
   | :-- | :-- |
@@ -130,9 +156,14 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
   | edax_runner を8本同時（`n-tasks = 4`）＋ book の merge | 42秒＋2秒 |
   | edax_runner を16本同時（`n-tasks = 2`）＋ book の merge | 35秒＋3秒 |
 
-- できる book は、`book-store-tasks = 1` で学習した book とまったく同じにはなりません。違いの大きさは [Edax 4.5.5 (nikque) のマニュアル 7.2「棋譜の学習を同時に行う：book-store-tasks」](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/ja/07-book-learning.md)に、実測の詳細は [Edax のテストと実測の記録（nikque.7）](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/docs/validation/nikque.ja.md#v455-nikque7)にあります。
-- 同じ組の棋譜は、その組を始める前の book を使って対局します。1局ごとの手順は表示しません。
-- `book deviate`、`fix`、1行だけの「Edax 対 Edax」は、1つずつ学習します（1局だけの場合も、その局面の探索は同時に行います。level 18 で1局ずつ30局の学習は18秒で、`book-store-tasks = 1` では35秒でした。edax に同じコマンドを入力して測った値です）。
+- できる book は、`book-store-tasks = 1` で学習した book とまったく同じにはなりません。
+  - 違いの大きさは、[Edax 4.5.5 (nikque) のマニュアル 7.2「棋譜の学習を同時に行う：book-store-tasks」](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/manual/ja/07-book-learning.md)にあります。
+  - 実測の詳細は、[Edax のテストと実測の記録（nikque.7）](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/docs/validation/nikque.ja.md#v455-nikque7)にあります。
+- 同じ組の棋譜は、その組を始める前の book を使って対局します。
+- 1 局ごとの手順は表示しません。
+- `book deviate`、`fix`、1 行だけの「Edax 対 Edax」は、1 つずつ学習します。
+  - 1 局だけの場合も、その局面の探索は同時に行います。
+  - level 18 で 1 局ずつ 30 局を学習すると、18 秒でした。`book-store-tasks = 1` では 35 秒でした。edax に同じコマンドを入力して測った値です。
 - それでも edax_runner を何本も同時に起動する場合は、合計のスレッド数が CPU の数を超えないように `n-tasks` を設定してください。
 
 ### 5. learning_list.txt と保存の修正
@@ -151,13 +182,25 @@ libedax を CPU の世代ごとにビルドしてあり、edax_runner は、お�
 そのほかの変更：
 
 - `[0 0]F5F6`、`[ 0 0 ] F5F6`、`2, F5F6` のような書き方も受け付けます。
-- `learning_list.txt` が作業フォルダにないときは、実行ファイルのあるフォルダを使います。
-- `learning_list.txt` の処理を速くし、メモリも少なくしました（バイト列のまま扱います。1行学習するごとに、行を取り出すときと、書き換える前に変わっていないかを確かめるときの2回読みます）。
-- `book.dat` を保存できないとき（ほかのプログラムが `book.dat` を開いている、など）は、1秒おきに30回まで保存をやり直します。それでも保存できなければ、`learning_list.txt` を変えずに止まります（5.3.0+nikque.3 から。それまでは、保存できていなくても学習済みとして行を消していました）。
-- 起動のときに `book.dat` を読めなかった（壊れている・途中で切れている）ときは、学習した book で置き換える前に `data/book.dat.damaged` として残します。残せなければ、`learning_list.txt` を変えずに止まります（5.3.0+nikque.10 から。Edax 4.5.5 nikque.16 以降の libedax で）。
-- 起動のときに `book.dat` を開けなかった（ほかのプログラムが共有なしで開いていた、など）ときは、libedax が 2 秒ほど待って開き直します。それでも開けなければ、edax_runner は学習を始めずに止まります。`book.dat` と `learning_list.txt` は変えません。時間をおいて起動し直してください（5.3.0+nikque.15 から。関数 `edax_book_file_status` を持つ Edax 4.5.5 nikque.27 以降の libedax で。それより前の libedax では、壊れた book と同じに扱われ、空の book に学習を始めて、元の `book.dat` を `.damaged` に移していました）。
-- 同じフォルダーで 2 つ目の edax_runner を起動すると、何もせずに止まります（動いている間、フォルダーの `edax_runner.lock` をつかみます。5.3.0+nikque.10 から）。
-- edax_runner を強制終了しても、`book.dat`・`learning_list.txt`・`learned_log.txt` は壊れません。学習の途中だった行（同時に学習していた棋譜は、その1組）は、次に起動したときに最初から学習します。book を保存した直後（`learning_list.txt` を書き換える前）に止めた場合は、その行（組）をもう一度学習し、`learned_log.txt` に2回載ることがあります。
+- `learning_list.txt` が作業フォルダーにないときは、実行ファイルのあるフォルダーを使います。
+- `learning_list.txt` の処理を速くし、メモリも少なくしました。
+  - `learning_list.txt` は、バイト列のまま扱います。
+  - 1 行学習するごとに 2 回読みます。行を取り出すときと、書き換える前に変わっていないかを確かめるときです。
+- `book.dat` を保存できないときは、1 秒おきに 30 回まで保存をやり直します。たとえば、ほかのプログラムが `book.dat` を開いているときです。
+  - それでも保存できなければ、`learning_list.txt` を変えずに止まります。
+  - 5.3.0+nikque.3 からです。それまでは、保存できていなくても、学習済みとして行を消していました。
+- 起動のときに `book.dat` を読めなかった（壊れている・途中で切れている）ときは、学習した book で置き換える前に、`data/book.dat.damaged` として残します。
+  - 残せなければ、`learning_list.txt` を変えずに止まります。
+  - 5.3.0+nikque.10 からです。Edax 4.5.5 nikque.16 以降の libedax を使う場合です。
+- 起動のときに `book.dat` を開けなかった（ほかのプログラムが共有なしで開いていた、など）ときは、libedax が 2 秒ほど待って開き直します。
+  - それでも開けなければ、edax_runner は学習を始めずに止まります。`book.dat` と `learning_list.txt` は変えません。時間をおいて起動し直してください。
+  - 5.3.0+nikque.15 からです。関数 `edax_book_file_status` を持つ、Edax 4.5.5 nikque.27 以降の libedax を使う場合です。
+  - それより前の libedax では、開けなかった book は、壊れた book と同じに扱われていました。edax_runner は空の book に学習を始め、元の `book.dat` を `.damaged` に移していました。
+- 同じフォルダーで 2 つ目の edax_runner を起動すると、何もせずに止まります。5.3.0+nikque.10 からです。
+  - edax_runner は、動いている間、フォルダーの `edax_runner.lock` をロックします。
+- edax_runner を強制終了しても、`book.dat`・`learning_list.txt`・`learned_log.txt` は壊れません。
+  - 学習の途中だった行は、次に起動したときに最初から学習します。同時に学習していた棋譜は、その 1 組を最初から学習します。
+  - book を保存した直後、`learning_list.txt` を書き換える前に止めた場合は、その行（組）をもう一度学習します。そのため、`learned_log.txt` に 2 回載ることがあります。
 
 ### 版
 

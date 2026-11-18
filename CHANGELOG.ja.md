@@ -6,16 +6,21 @@
 
 ## 5.3.0+nikque.16
 
-同梱の libedax を Edax 4.5.5 nikque.29 に更新しました（nikque.28 の libedax で完全読みの不具合が直り、nikque.29 の libedax で book のコマンドを途中から続けられるようになりました）。edax_runner そのものは変えていません。タグは `v5.3.0-nikque.16`、libedax：[Edax 4.5.5 nikque.29](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.29)。
+同梱の libedax を Edax 4.5.5 nikque.29 に更新しました。nikque.28 の libedax で完全読みの不具合が直り、nikque.29 の libedax で book のコマンドを途中から続けられるようになりました。edax_runner そのものは変えていません。タグは `v5.3.0-nikque.16`、libedax：[Edax 4.5.5 nikque.29](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.29)。
 
 **変更**
 
-- libedax を Edax 4.5.5 nikque.29 のものにしました（Edax の変更点：[nikque.29](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque29)）。nikque.28 までの直しで、空き 17 マス以上の level 60 の完全読みが、まれに評価値を誤ることがなくなりました。nikque.29 で、`book correct`・`book leaf recalculate`（`edax_book_correct`・`edax_book_leaf_recalculate*`）が、棋譜のファイルからの `book learn` と同じく途中で保存された book から続けられ、`book deepen`（`edax_book_deepen`）が働くようになりました。edax_runner は `book store` で学習し、これらのコマンドは使いません。
+- libedax を Edax 4.5.5 nikque.29 のものにしました（Edax の修正一覧：[nikque.29](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque29)）。
+- nikque.28 までの直しで、空き 17 マス以上の level 60 の完全読みが、まれに評価値を誤ることがなくなりました。
+- nikque.29 で、`book correct`・`book leaf recalculate`（`edax_book_correct`・`edax_book_leaf_recalculate*`）が、途中で保存された book から続けられるようになりました。棋譜のファイルからの `book learn` と同じです。
+- nikque.29 で、`book deepen`（`edax_book_deepen`）が働くようになりました。
+- edax_runner は `book store` で学習し、これらのコマンドは使いません。
 
 **互換性**
 
 - edax_runner が使う libedax の関数とその動き、`eval.dat`、`config.ini` の設定は nikque.27（5.3.0+nikque.15）と同じです。
-- libedax が `book correct`・`book leaf recalculate` の終わる前に保存した book には途中の印があり、nikque.28 以前の libedax（edax_runner 5.3.0+nikque.15 以前）では壊れた book として読まれます。edax_runner はこのような book を作りません。
+- libedax が `book correct`・`book leaf recalculate` の終わる前に保存した book には、途中の印があります。このような book は、nikque.28 以前の libedax（edax_runner 5.3.0+nikque.15 以前）では、壊れた book として読まれます。
+- edax_runner はこのような book を作りません。
 
 **未確認**：速さとメモリ、Linux・macOS の実機での実行。
 
@@ -28,19 +33,29 @@ edax_runner の不具合（起動のときに開けなかった `book.dat`、`le
 
 **変更**
 
-- libedax を Edax 4.5.5 nikque.27 のものにしました（Edax の変更点：[nikque.27](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque27)）。起動のときに book のファイルを開けない（ほかのプログラムが共有なしで開いている）と、libedax は 2 秒ほど待って開き直します。それでも開けなければ、どの保存もそのファイルを置き換えず、新しい関数 `edax_book_file_status` がそれを知らせます。
-- 起動のときに `book.dat` を開けなかった（ウイルス対策・バックアップなどのプログラムが共有なしで開いていた）ときは、edax_runner は学習せずに止まり（終了コード 1）、`book.dat` も `learning_list.txt` も変えません。これまでは空の book に学習し、その book で `book.dat` を置き換えて、元の `book.dat` を `data/book.dat.damaged` に移していました。
-- 最初に学習する行（組）も、次からの行と同じく、book を読み込んだ後の `learning_list.txt` から取ります。これまでは book を読み込む前に読んだリストから取っていたので（大きな book では数分かかります）、その間に消した行や足した `exit` が間に合いませんでした。
+- libedax を Edax 4.5.5 nikque.27 のものにしました（Edax の修正一覧：[nikque.27](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque27)）。
+  - 起動のときに book のファイルを開けない（ほかのプログラムが共有なしで開いている）と、libedax は 2 秒ほど待って開き直します。
+  - それでも開けなければ、どの保存もそのファイルを置き換えません。新しい関数 `edax_book_file_status` がそれを知らせます。
+- 起動のときに `book.dat` を開けなかった（ウイルス対策・バックアップなどのプログラムが共有なしで開いていた）ときは、edax_runner は学習せずに止まります（終了コード 1）。`book.dat` も `learning_list.txt` も変えません。
+  - これまでは空の book に学習し、その book で `book.dat` を置き換えて、元の `book.dat` を `data/book.dat.damaged` に移していました。
+- 最初に学習する行（組）も、次からの行と同じく、book を読み込んだ後の `learning_list.txt` から取ります。
+  - これまでは、book を読み込む前に読んだリストから取っていました。大きな book では読み込みに数分かかるので、その間に消した行や足した `exit` が間に合いませんでした。
 - 行の終わりが CR だけの `learning_list.txt` を 1 行ずつ読みます。これまでは全体を書式の違う 1 行として読み、リスト全体を `learned_log.txt` に移していました。
 - 同時に学習する棋譜が 1 局も学習できなかった（打てない手がある）ときは、book を保存し直しません。
-- 学習した行を `learning_list.txt` から消すときに、その間に保存された編集を、大きさと時刻だけでなく中身で見分け、何度保存されても、保存された中身から行を消します。1 分ほど保存が続くときは、リストを書き換えずに止まります（その行は `learned_log.txt` に記録してあり、次の起動でもう一度学習します）。これまでは 5 回目の後にリストを置き換え、編集が失われていました。`learned_log.txt` は、リストを最後に確かめる前に書くようにしました。
+- 学習した行を `learning_list.txt` から消すときに、その間に保存された編集を、大きさと時刻だけでなく中身で見分けます。何度保存されても、保存された中身から行を消します。
+  - 1 分ほど保存が続くときは、リストを書き換えずに止まります。その行は `learned_log.txt` に記録してあり、次の起動でもう一度学習します。
+  - これまでは 5 回目の後にリストを置き換え、編集が失われていました。
+- `learned_log.txt` は、リストを最後に確かめる前に書くようにしました。
 - libedax（nikque）の関数を呼ぶ所を整理し、テストを足しました（38 件）。
 
 **互換性**
 
 - Edax 4.5.5 nikque.27 以降の libedax（同梱のもの）と使います。それより前の libedax では、起動のときに開けない `book.dat` は、5.3.0+nikque.14 と同じく壊れた book として扱われます。
-- nikque.27 以降の libedax を edax_runner 5.3.0+nikque.14 以前と組み合わせないでください。起動のときに `book.dat` を開けないと、book は守られますが、古い edax_runner は学習を始め、book を保存できずに 30 秒ほど再試しした後、誤りで終わり（終了コード 255）、`data/book.dat.saving` が残ります。
-- 起動のときに開けない book のファイルのほかは、edax_runner が使う libedax の関数とその動き、`eval.dat`、`config.ini` の設定は nikque.26（5.3.0+nikque.14）と同じです。`learning_list.txt` は 1 行学習するごとに 2 回読みます（行を取り出すときと、書き換える前に確かめるとき）。
+- nikque.27 以降の libedax を edax_runner 5.3.0+nikque.14 以前と組み合わせないでください。起動のときに `book.dat` を開けないと、次のようになります。
+  - book は守られます。
+  - 古い edax_runner は学習を始め、book を保存できません。30 秒ほど保存をやり直した後、エラーで終わり（終了コード 255）、`data/book.dat.saving` が残ります。
+- 起動のときに開けない book のファイルのほかは、edax_runner が使う libedax の関数とその動き、`eval.dat`、`config.ini` の設定は nikque.26（5.3.0+nikque.14）と同じです。
+- `learning_list.txt` は、1 行学習するごとに 2 回読みます（行を取り出すときと、書き換える前に確かめるとき）。
 
 **未確認**：速さとメモリ、Linux・macOS の実機での実行。
 
@@ -53,7 +68,7 @@ edax_runner の不具合（起動のときに開けなかった `book.dat`、`le
 
 **変更**
 
-- libedax を Edax 4.5.5 nikque.26 のものにしました（Edax の変更点：[nikque.26](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque26)）。
+- libedax を Edax 4.5.5 nikque.26 のものにしました（Edax の修正一覧：[nikque.26](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque26)）。
 - nikque.26 は、Edax のテキストのコマンド `book deviate`・`book deviate2`・`book deviate3` に `export <file> [leaf|ends|all]` を足し、libedax に関数 `edax_book_deviate_export(base, x, y, file, which)` を足しました。今の局面からこれらのコマンドがたどる進行を、book を広げずにテキストファイルに書き出します。edax_runner はこれらを使いません。
 - CI：macOS のジョブを `macos-15` で動かすようにしました（`macos-latest` では機械が割り当てられませんでした）。macOS の ZIP の名前は同じです。
 
@@ -68,7 +83,20 @@ edax_runner の不具合（起動のときに開けなかった `book.dat`、`le
 ---
 ## 5.3.0+nikque.13
 
-同梱の libedax を Edax 4.5.5 nikque.25 に更新しました。nikque.23 から 25 の間で変わったエンジンのソースは book 解析の実装です。libedax の API と runner のソースは変更していません。[検証記録](docs/validation/changelog.ja.md#530nikque13)
+同梱の libedax を Edax 4.5.5 nikque.25 に更新しました。タグは `v5.3.0-nikque.13`、libedax：[Edax 4.5.5 nikque.25](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.25)。
+
+**変更**
+
+- libedax を Edax 4.5.5 nikque.25 のものにしました（Edax の修正一覧：[nikque.24](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque24)・[nikque.25](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque25)）。
+- nikque.23 から 25 の間で変わったエンジンのソースは、book 解析の実装です。
+
+**互換性**
+
+- libedax の API と runner のソースは変更していません。
+
+**未確認**：速さとメモリ、Linux・macOS での実行。
+
+[検証記録](docs/validation/changelog.ja.md#530nikque13)
 
 ---
 ## 5.3.0+nikque.12
@@ -78,8 +106,11 @@ edax_runner の不具合（起動のときに開けなかった `book.dat`、`le
 **変更**
 
 - libedax を Edax 4.5.5 nikque.23 のものにしました（Edax の修正一覧：[nikque.23](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque23)）。
-- nikque.23 で変わったのは、Edax のテキストのコマンド `book moveinfo`（精度の段階を前後の局面の答えから引き継ぐ）と、book のコマンドを `book` なしで打ったときの警告の案内です。edax_runner はこれらを使いません。
-- 文書：この変更履歴を書き直し、テストと実測の記録を `docs/validation/` へ移しました。`config.ini` の初めの説明の行は、Edax の手引きの 4 章を指します（設定は同じです）。
+- nikque.23 で変わったのは、次の 2 つです。edax_runner はこれらを使いません。
+  - Edax のテキストのコマンド `book moveinfo`：精度の段階を、前後の局面の答えから引き継ぎます。
+  - book のコマンドを `book` なしで入力したときの警告の案内。
+- 文書：この変更履歴を書き直し、テストと実測の記録を `docs/validation/` へ移しました。
+- `config.ini` の初めの説明の行は、Edax のマニュアルの 4 章を指します（設定は同じです）。
 
 **互換性**
 
@@ -129,7 +160,10 @@ edax_runner の不具合（起動のときに開けなかった `book.dat`、`le
 
 **不具合の修正**
 
-- 起動のときに読めなかった `data/book.dat`（壊れている・途中で切れている）が、何もない状態から学習した book で置き換えられていました（5.3.0+nikque.3 から。book を `data/book.dat.saving` に保存してから `data/book.dat` へ名前を変えるため）。→ 名前を変える前に、`data/book.dat.damaged` として残します（libedax の関数 `edax_book_keep_unread_file`、Edax 4.5.5 nikque.16 から）。残せないときは `book.dat` を置き換えず、`learning_list.txt` を変えずに止まります。
+- 起動のときに読めなかった `data/book.dat`（壊れている・途中で切れている）が、何もない状態から学習した book で置き換えられていました。
+  - 5.3.0+nikque.3 から起きていました。book を `data/book.dat.saving` に保存してから、`data/book.dat` へ名前を変えるためです。
+  - → 名前を変える前に、`data/book.dat.damaged` として残します。libedax の関数 `edax_book_keep_unread_file`（Edax 4.5.5 nikque.16 から）を使います。
+  - 残せないときは `book.dat` を置き換えず、`learning_list.txt` を変えずに止まります。
 
 **互換性**
 
@@ -192,9 +226,11 @@ Edax 本体とライブラリの版をそろえるための更新です。edax_r
 
 **不具合の修正**
 
-- 80 手（着手＋パス）を超える行を、「illegal move」として飛ばしていました。パスが 21 回以上ある対局でだけ起きます（通常の初期局面からでも、着手 60＋パス 22＝82 手の対局があります）。ふつうの学習リストでは当たりません。
+- 80 手（着手＋パス）を超える行を、「illegal move」として飛ばしていました。
+  - パスが 21 回以上ある対局でだけ起きます。通常の初期局面からでも、着手 60＋パス 22＝82 手の対局があります。ふつうの学習リストでは当たりません。
   - 棋譜を同時に学習する場合（`book-store-tasks` が `auto` か 2 以上）：libedax の中の対局の記録が 80 手ぶんのままでした。→ Edax 4.5.5 nikque.13 で直りました。
-  - 1 局ずつ学習する場合（`book-store-tasks = 1`、`[relativeError absoluteError]` 付きの行）：edax_runner は打った手順を libedax から読み戻して行と比べますが、読み戻せるのは 80 手までです。→ 読み戻した手順が行の先頭と一致し、盤上の石の数が「4＋行の手の数」なら、全部の手が打てたと判断します。80 手以下の行の判定は変わりません。
+  - 1 局ずつ学習する場合（`book-store-tasks = 1`、`[relativeError absoluteError]` 付きの行）：edax_runner は打った手順を libedax から読み戻して行と比べますが、読み戻せるのは 80 手までです。
+  - → 読み戻した手順が行の先頭と一致し、盤上の石の数が「4＋行の手の数」なら、全部の手が打てたと判断します。80 手以下の行の判定は変わりません。
 - 合法手のない局面（パスの局面）の探索で、まれに異常終了していました。→ 直しました（libedax。探索の結果は変わりません）。
 
 **互換性**
@@ -241,7 +277,10 @@ Edax 本体とライブラリの版をそろえるための更新です。edax_r
 
 - libedax と `config.ini` を Edax 4.5.5 nikque.10 のものにしました。
 - `fix`（`book fix`）：大きな book で、Link の張り直しが速くなりました（6億6162万局面の book・32 スレッドで 153.7 秒 → 136.3 秒。Edax 本体での計測）。
-- `[relativeError absoluteError]`（`book deviate`）：level 18 以下で、1 周の展開の対象が多いとき（`n-tasks` の 32 倍以上。32 スレッドなら 1,024 件以上）は、1 スレッドの探索を `n-tasks` 個同時に動かします（これまでは 2 スレッドの探索を半分の数）。649万局面の book・32 スレッドで、60 秒に展開できる件数が約 1.25 倍になりました（Edax 本体での計測）。対象の少ない周は変わりません。
+- `[relativeError absoluteError]`（`book deviate`）：level 18 以下で、1 周の展開の対象が多いときは、1 スレッドの探索を `n-tasks` 個同時に動かします。これまでは 2 スレッドの探索を半分の数でした。
+  - 対象が多いとは、`n-tasks` の 32 倍以上のときです。32 スレッドなら 1,024 件以上です。
+  - 649万局面の book・32 スレッドで、60 秒に展開できる件数が約 1.25 倍になりました（Edax 本体での計測）。
+  - 対象の少ない周は変わりません。
 
 **不具合の修正**
 
@@ -275,8 +314,13 @@ book の保存に失敗したときや、メモリが足りないときに、学
 
 **不具合の修正**
 
-- `book.dat` を保存できなかったとき（ほかのプログラムが `book.dat` を開いている、など）に、それに気づかず、学習した行を `learning_list.txt` から消していました。そのまま終わると、その学習は `book.dat` に残りませんでした。→ book を別のファイル（`data/book.dat.saving`）に保存させ、保存できたことを確かめてから（libedax に足した、成否を返す関数 `edax_book_save_checked` と、ファイルの確認）`book.dat` と置き換えます。保存できないときは 1 秒おきに 30 回までやり直し、それでも保存できなければ、`learning_list.txt` を変えずに止まります。
-- 同時に学習した棋譜の局面を book に追加できなかったとき（メモリ不足）も、学習済みとして行を消していました。→ `learning_list.txt` を変えずに止まります（Edax 4.5.5 nikque.9 の libedax が失敗を知らせます）。1 局ずつの学習、`[relativeError absoluteError]`、`fix` で局面を追加できなかったときも同じです（libedax に足した関数 `edax_book_failed`）。
+- `book.dat` を保存できなかったとき（ほかのプログラムが `book.dat` を開いている、など）に、それに気づかず、学習した行を `learning_list.txt` から消していました。そのまま終わると、その学習は `book.dat` に残りませんでした。
+  - → book を別のファイル（`data/book.dat.saving`）に保存させ、保存できたことを確かめてから `book.dat` と置き換えます。
+  - 確かめるのには、libedax に足した、成否を返す関数 `edax_book_save_checked` と、ファイルの確認を使います。
+  - 保存できないときは 1 秒おきに 30 回までやり直し、それでも保存できなければ、`learning_list.txt` を変えずに止まります。
+- 同時に学習した棋譜の局面を book に追加できなかったとき（メモリ不足）も、学習済みとして行を消していました。
+  - → `learning_list.txt` を変えずに止まります。Edax 4.5.5 nikque.9 の libedax が失敗を知らせます。
+  - 1 局ずつの学習、`[relativeError absoluteError]`、`fix` で局面を追加できなかったときも同じです（libedax に足した関数 `edax_book_failed`）。
 - 複数スレッドの探索で、手が探索されないままになるノードができることがありました（結果を誤ることはまれ。元の Edax 4.5.5 からある不具合）。
 - `learning_list.txt` の行が、手の間の空白のために 255 バイトを超えると、短い手順として学習されることがありました。
 - 起動時に読めなかった book ファイル（壊れている、ほかのプログラムが開いている）が、学習の後で上書きされていました。→ `book.dat.damaged` として残します。
@@ -306,7 +350,10 @@ book の保存に失敗したときや、メモリが足りないときに、学
 
 **不具合の修正**
 
-- `book-store-tasks = auto`（既定）のとき、探索する局面が少ない場合や level が高い場合に、`1` より遅くなっていました（1 局の学習が、level 24 で 13 秒のところ 26 秒、level 21 で 4.2 秒のところ 6.4 秒）。→ 同時に行う探索の間でスレッドを分け合うようにし、level 24 で 6〜11 秒、level 21 で 2.0 秒になりました。level 18 で 1 局ずつ 30 局の学習は、29 秒から 18 秒になりました（`1` では 35 秒）。（edax のコマンドで測った値です）
+- `book-store-tasks = auto`（既定）のとき、探索する局面が少ない場合や level が高い場合に、`1` より遅くなっていました。1 局の学習が、level 24 で 13 秒のところ 26 秒、level 21 で 4.2 秒のところ 6.4 秒でした。
+  - → 同時に行う探索の間で、スレッドを分け合うようにしました。level 24 で 6〜11 秒、level 21 で 2.0 秒になりました。
+  - level 18 で 1 局ずつ 30 局の学習は、29 秒から 18 秒になりました（`1` では 35 秒）。
+  - 値は edax のコマンドで測ったものです。
 
 **互換性**：この版の記録には書いていません。Edax 側の互換性は [Edax の修正一覧 nikque.8](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque8) にあります。
 
