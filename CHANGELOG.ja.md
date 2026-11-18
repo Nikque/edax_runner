@@ -34,7 +34,7 @@ edax_runner の不具合（起動のときに開けなかった `book.dat`、`le
 - 行の終わりが CR だけの `learning_list.txt` を 1 行ずつ読みます。これまでは全体を書式の違う 1 行として読み、リスト全体を `learned_log.txt` に移していました。
 - 同時に学習する棋譜が 1 局も学習できなかった（打てない手がある）ときは、book を保存し直しません。
 - 学習した行を `learning_list.txt` から消すときに、その間に保存された編集を、大きさと時刻だけでなく中身で見分け、何度保存されても、保存された中身から行を消します。1 分ほど保存が続くときは、リストを書き換えずに止まります（その行は `learned_log.txt` に記録してあり、次の起動でもう一度学習します）。これまでは 5 回目の後にリストを置き換え、編集が失われていました。`learned_log.txt` は、リストを最後に確かめる前に書くようにしました。
-- libedax（nikque）の関数を呼ぶ所を整理し、試験を足しました（38 件）。
+- libedax（nikque）の関数を呼ぶ所を整理し、テストを足しました（38 件）。
 
 **互換性**
 
@@ -54,7 +54,7 @@ edax_runner の不具合（起動のときに開けなかった `book.dat`、`le
 **変更**
 
 - libedax を Edax 4.5.5 nikque.26 のものにしました（Edax の変更点：[nikque.26](https://github.com/Nikque/edax-reversi-AVX/blob/edax-4.5.5-fixes/RELEASE-NOTES.ja.md#v455-nikque26)）。
-- nikque.26 は、Edax の文字の命令 `book deviate`・`book deviate2`・`book deviate3` に `export <file> [leaf|ends|all]` を足し、libedax に関数 `edax_book_deviate_export(base, x, y, file, which)` を足しました。今の局面からこれらの命令がたどる進行を、book を広げずにテキストファイルに書き出します。edax_runner はこれらを使いません。
+- nikque.26 は、Edax のテキストのコマンド `book deviate`・`book deviate2`・`book deviate3` に `export <file> [leaf|ends|all]` を足し、libedax に関数 `edax_book_deviate_export(base, x, y, file, which)` を足しました。今の局面からこれらのコマンドがたどる進行を、book を広げずにテキストファイルに書き出します。edax_runner はこれらを使いません。
 - CI：macOS のジョブを `macos-15` で動かすようにしました（`macos-latest` では機械が割り当てられませんでした）。macOS の ZIP の名前は同じです。
 
 **互換性**
