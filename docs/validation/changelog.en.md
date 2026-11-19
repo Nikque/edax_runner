@@ -4,6 +4,14 @@
 
 The tests and measurements done for the versions of this fork, moved unchanged from [CHANGELOG.md](../../CHANGELOG.md). What changed in each version is in [CHANGELOG.md](../../CHANGELOG.md).
 
+## 5.3.0+nikque.18
+
+- All three Windows libraries, all three Linux libraries, and the macOS library match the published nikque.31 ZIP.
+- Dart formatting, static analysis, and all 38 tests passed on Windows. The local executable built successfully.
+- Synthetic-book learning passed with the new Windows executable and with the previous runner executable paired with the new libraries on WSL. The WSL test copy was launched with Ubuntu 24.04 glibc. Both selected the AVX-512 library and updated the book and learning log.
+
+---
+
 ## 5.3.0+nikque.17
 
 - All three Windows libraries, three Linux libraries, and the macOS library match the nikque.30 release ZIP. Evaluation data and configuration are unchanged.
