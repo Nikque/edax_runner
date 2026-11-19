@@ -4,6 +4,14 @@
 
 The tests and measurements done for the versions of this fork, moved unchanged from [CHANGELOG.md](../../CHANGELOG.md). What changed in each version is in [CHANGELOG.md](../../CHANGELOG.md).
 
+## 5.3.0+nikque.17
+
+- All three Windows libraries, three Linux libraries, and the macOS library match the nikque.30 release ZIP. Evaluation data and configuration are unchanged.
+- Dart formatting, static analysis and 38 tests passed on Windows. The local executable built successfully.
+- A synthetic-book test selected the AVX-512 DLL, completed learning, and updated the book and learning log.
+
+---
+
 ## 5.3.0+nikque.16
 
 - The seven libraries match the published nikque.29 ZIP (taken again from the release and checked against its digest and SHA256SUMS); before the change, each was that of the nikque.27 ZIP. No build folder names were found. Sizes: the Windows DLLs +512 bytes each, the Linux libraries 0 to +4,096 bytes, the macOS library +48 bytes. `bin/config.ini` is the same in nikque.27 and nikque.29, and `resources/data/eval.dat` is the `bin/data/eval.dat` of nikque.29.

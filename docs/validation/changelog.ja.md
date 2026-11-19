@@ -4,6 +4,14 @@
 
 この fork の各版で行ったテストと実測の記録です。[CHANGELOG.ja.md](../../CHANGELOG.ja.md) から、そのまま移しました。各版で何が変わったかは [CHANGELOG.ja.md](../../CHANGELOG.ja.md) にあります。
 
+## 5.3.0+nikque.17
+
+- Windows 3、Linux 3、macOS 1 の libedax は、公開した nikque.30 の ZIP と一致しました。評価ファイルと設定への変更はありません。
+- Windows で Dart の整形、静的解析、38 テストが通りました。ローカルの実行ファイルをビルドしました。
+- 合成 book で、AVX-512 の DLL を選んで学習し、book と学習記録が更新されることを確認しました。
+
+---
+
 ## 5.3.0+nikque.16
 
 - ライブラリ７個は、Release から取り直して digest と SHA256SUMS と照らした nikque.29 の ZIP と一致しました（入れ替える前は、どれも nikque.27 の ZIP のもの）。ビルドしたときのフォルダー名は見つかりませんでした。大きさは Windows の DLL が各 +512 バイト、Linux のライブラリが 0〜+4,096 バイト、macOS のライブラリが +48 バイト。`bin/config.ini` は nikque.27 と nikque.29 で同じ、`resources/data/eval.dat` は nikque.29 の `bin/data/eval.dat` と同じです。

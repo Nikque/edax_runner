@@ -206,6 +206,7 @@ Other changes:
 
 | edax_runner | Edax | |
 | :-- | :-- | :-- |
+| [5.3.0+nikque.17](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.17) | [4.5.5 nikque.30](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.30) | libedax update with an exact-endgame fix |
 | [5.3.0+nikque.16](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.16) | [4.5.5 nikque.29](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.29) | libedax update (the fix of the exact search; book commands going on from a saved book) |
 | [5.3.0+nikque.15](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.15) | [4.5.5 nikque.27](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.27) | fixes (a book that can't be opened at startup, learning list) and libedax update (`edax_book_file_status`) |
 | [5.3.0+nikque.14](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.14) | [4.5.5 nikque.26](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.26) | libedax update (the new function `edax_book_deviate_export`) |

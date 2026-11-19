@@ -4,6 +4,24 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。テストと実測の記録は [docs/validation/changelog.ja.md](docs/validation/changelog.ja.md) にあります。
 
+## 5.3.0+nikque.17
+
+同梱の libedax を、終盤の完全読みを修正した Edax 4.5.5 nikque.30 に更新しました。タグは `v5.3.0-nikque.17`。libedax は [Edax 4.5.5 nikque.30](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.30) です。
+
+**変更**
+
+- libedax の７ファイルを更新しました。（Edax の修正一覧：[nikque.30](https://github.com/Nikque/edax-reversi-AVX/blob/v4.5.5-nikque.30/RELEASE-NOTES.ja.md#v455-nikque30)）
+
+**互換性**
+
+- `learning_list.txt`、`config.ini`、`eval.dat`、book のファイル形式は従来と同じです。完全読みの不具合が影響する局面では、学習で記録される値が変わる場合があります。
+
+**未確認**。速さとメモリ、Linux・macOS の実機での実行。
+
+[検証記録](docs/validation/changelog.ja.md#530nikque17)
+
+---
+
 ## 5.3.0+nikque.16
 
 同梱の libedax を Edax 4.5.5 nikque.29 に更新しました。nikque.28 の libedax で完全読みの不具合が直り、nikque.29 の libedax で book のコマンドを途中から続けられるようになりました。edax_runner そのものは変えていません。タグは `v5.3.0-nikque.16`、libedax：[Edax 4.5.5 nikque.29](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.29)。
