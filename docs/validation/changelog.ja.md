@@ -4,6 +4,14 @@
 
 この fork の各版で行ったテストと実測の記録です。[CHANGELOG.ja.md](../../CHANGELOG.ja.md) から、そのまま移しました。各版で何が変わったかは [CHANGELOG.ja.md](../../CHANGELOG.ja.md) にあります。
 
+## 5.3.0+nikque.19
+
+- Windows の3本、Linux の3本、macOS の1本が、公開された nikque.32 の ZIP に含まれる libedax と一致しました。評価ファイルは変わっていません。
+- Windows で Dart の整形、静的解析、38 テストが通りました。ローカルの実行ファイルをビルドしました。
+- Windows の新しいビルドで、合成 book の学習（level 1）を確認しました。AVX-512 用のライブラリが選ばれ、book と学習記録が更新されました。book は 5.3.0+nikque.17 のときと同じでした。
+
+---
+
 ## 5.3.0+nikque.18
 
 - Windows の3本、Linux の3本、macOS の1本が、公開された nikque.31 の ZIP に含まれる libedax と一致しました。

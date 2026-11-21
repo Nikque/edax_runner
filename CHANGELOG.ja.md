@@ -4,6 +4,24 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。テストと実測の記録は [docs/validation/changelog.ja.md](docs/validation/changelog.ja.md) にあります。
 
+## 5.3.0+nikque.19
+
+同梱の libedax を [Edax 4.5.5 nikque.32](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.32) に更新しました。タグは `v5.3.0-nikque.19` です。
+
+**変更**
+
+- Windows・Linux・macOS 用の libedax 7 本を更新しました。終盤の完全読みが速くなった版です。（Edax の修正一覧：[nikque.32](https://github.com/Nikque/edax-reversi-AVX/blob/v4.5.5-nikque.32/RELEASE-NOTES.ja.md#v455-nikque32)）
+
+**互換性**
+
+- 前の版の `eval.dat`、`config.ini`、`learning_list.txt`、book を引き続き使えます。
+
+**未確認**。速さとメモリ、Linux と macOS の実機での学習。
+
+[検証記録](docs/validation/changelog.ja.md#530nikque19)
+
+---
+
 ## 5.3.0+nikque.18
 
 同梱の libedax を [Edax 4.5.5 nikque.31](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.31) に更新しました。タグは `v5.3.0-nikque.18` です。

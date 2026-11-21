@@ -4,6 +4,24 @@
 
 Versions of this fork. The history of the original edax_runner (5.3.0 and earlier) follows below. The tests and measurements are in [docs/validation/changelog.en.md](docs/validation/changelog.en.md).
 
+## 5.3.0+nikque.19
+
+This release bundles libedax from [Edax 4.5.5 nikque.32](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.32). The tag is `v5.3.0-nikque.19`.
+
+**Changes**
+
+- Updated the seven libedax libraries for Windows, Linux, and macOS. This version has a faster exact endgame search. (Edax release notes: [nikque.32](https://github.com/Nikque/edax-reversi-AVX/blob/v4.5.5-nikque.32/RELEASE-NOTES.md#v455-nikque32))
+
+**Compatibility**
+
+- You can continue to use your existing `eval.dat`, `config.ini`, `learning_list.txt`, and book files.
+
+**Not checked.** Speed, memory usage, and learning on Linux and macOS hardware.
+
+[Tests and measurements](docs/validation/changelog.en.md#530nikque19)
+
+---
+
 ## 5.3.0+nikque.18
 
 This release bundles libedax from [Edax 4.5.5 nikque.31](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.31). The tag is `v5.3.0-nikque.18`.

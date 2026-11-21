@@ -4,6 +4,14 @@
 
 The tests and measurements done for the versions of this fork, moved unchanged from [CHANGELOG.md](../../CHANGELOG.md). What changed in each version is in [CHANGELOG.md](../../CHANGELOG.md).
 
+## 5.3.0+nikque.19
+
+- All three Windows libraries, all three Linux libraries, and the macOS library match the published nikque.32 ZIP. The evaluation data is unchanged.
+- Dart formatting, static analysis, and all 38 tests passed on Windows. The local executable built successfully.
+- Synthetic-book learning (level 1) passed with the new Windows executable. It selected the AVX-512 library and updated the book and learning log. The book was the same as with 5.3.0+nikque.17.
+
+---
+
 ## 5.3.0+nikque.18
 
 - All three Windows libraries, all three Linux libraries, and the macOS library match the published nikque.31 ZIP.
