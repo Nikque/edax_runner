@@ -206,6 +206,7 @@ libedax は、CPU の世代ごとにビルドしてあります。Windows と Li
 
 | edax_runner | Edax | |
 | :-- | :-- | :-- |
+| [5.3.0+nikque.20](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.20) | [4.5.5 nikque.33](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.33) | 手を読む順番を変えた libedax の更新、`config.ini` を nikque.33 と同じに |
 | [5.3.0+nikque.19](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.19) | [4.5.5 nikque.32](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.32) | 終盤の完全読みを速くした libedax の更新 |
 | [5.3.0+nikque.18](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.18) | [4.5.5 nikque.31](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.31) | Windows・Linux・macOS 用の libedax を更新 |
 | [5.3.0+nikque.17](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.17) | [4.5.5 nikque.30](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.30) | 完全読みの不具合を修正した libedax の更新 |

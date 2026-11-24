@@ -4,6 +4,26 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。テストと実測の記録は [docs/validation/changelog.ja.md](docs/validation/changelog.ja.md) にあります。
 
+## 5.3.0+nikque.20
+
+同梱の libedax を [Edax 4.5.5 nikque.33](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.33) に更新しました。タグは `v5.3.0-nikque.20` です。
+
+**変更**
+
+- Windows・Linux・macOS 用の libedax 7 本を更新しました。手を読む順番と持ち時間の配り方が変わった版です。（Edax の修正一覧：[nikque.33](https://github.com/Nikque/edax-reversi-AVX/blob/v4.5.5-nikque.33/RELEASE-NOTES.ja.md#v455-nikque33)）
+- 同梱の `config.ini` を nikque.33 の `bin/config.ini` と同じにしました。`lazy`・`pc-slope`・`pc-dev`・`pc-mob` の 4 つの設定と説明が加わりました。既定は `lazy = 0`、ほか 3 つは `off` で、前の版と同じ読みです。
+
+**互換性**
+
+- 前の版の `eval.dat`、`config.ini`、`learning_list.txt`、book を引き続き使えます。前の版の `config.ini` には 4 つの設定がありませんが、既定の値で動きます。
+- 手を読む順番が変わるので、ノード数は変わります。学習した book の値も、まれに変わります。
+
+**未確認**。速さとメモリ、Linux と macOS の実機での学習。
+
+[検証記録](docs/validation/changelog.ja.md#530nikque20)
+
+---
+
 ## 5.3.0+nikque.19
 
 同梱の libedax を [Edax 4.5.5 nikque.32](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.32) に更新しました。タグは `v5.3.0-nikque.19` です。

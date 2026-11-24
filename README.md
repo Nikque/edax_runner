@@ -206,6 +206,7 @@ Other changes:
 
 | edax_runner | Edax | |
 | :-- | :-- | :-- |
+| [5.3.0+nikque.20](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.20) | [4.5.5 nikque.33](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.33) | libedax update with a new move ordering; `config.ini` the same as nikque.33 |
 | [5.3.0+nikque.19](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.19) | [4.5.5 nikque.32](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.32) | libedax update with a faster exact endgame search |
 | [5.3.0+nikque.18](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.18) | [4.5.5 nikque.31](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.31) | libedax update for Windows, Linux, and macOS |
 | [5.3.0+nikque.17](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.17) | [4.5.5 nikque.30](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.30) | libedax update with an exact-endgame fix |

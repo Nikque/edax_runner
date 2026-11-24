@@ -4,6 +4,26 @@
 
 Versions of this fork. The history of the original edax_runner (5.3.0 and earlier) follows below. The tests and measurements are in [docs/validation/changelog.en.md](docs/validation/changelog.en.md).
 
+## 5.3.0+nikque.20
+
+This release bundles libedax from [Edax 4.5.5 nikque.33](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.33). The tag is `v5.3.0-nikque.20`.
+
+**Changes**
+
+- Updated the seven libedax libraries for Windows, Linux, and macOS. This version changes the move ordering and the use of the time limit. (Edax release notes: [nikque.33](https://github.com/Nikque/edax-reversi-AVX/blob/v4.5.5-nikque.33/RELEASE-NOTES.md#v455-nikque33))
+- The bundled `config.ini` is now the same as `bin/config.ini` of nikque.33. It adds the settings `lazy`, `pc-slope`, `pc-dev`, and `pc-mob` with their descriptions. The defaults are `lazy = 0` and `off` for the other three, so the search is the same as with the previous `config.ini`.
+
+**Compatibility**
+
+- You can continue to use your existing `eval.dat`, `config.ini`, `learning_list.txt`, and book files. An older `config.ini` does not have the four settings; their defaults are used.
+- The node counts change because the move ordering changes. In rare cases, a learned book gets different values.
+
+**Not checked.** Speed, memory usage, and learning on Linux and macOS hardware.
+
+[Tests and measurements](docs/validation/changelog.en.md#530nikque20)
+
+---
+
 ## 5.3.0+nikque.19
 
 This release bundles libedax from [Edax 4.5.5 nikque.32](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.32). The tag is `v5.3.0-nikque.19`.
