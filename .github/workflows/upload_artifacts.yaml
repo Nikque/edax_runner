@@ -62,7 +62,7 @@ jobs:
             cp -R "$input/evidence" "dist/evidence/$arch"
           done
           lipo -create "$ARM/libedax.universal.dylib" "$INTEL/libedax.universal.dylib" -output dist/libedax.universal.dylib
-          lipo -verify_arch arm64 x86_64 dist/libedax.universal.dylib
+          lipo dist/libedax.universal.dylib -verify_arch arm64 x86_64
           test "$(lipo -archs dist/libedax.universal.dylib | wc -w | tr -d ' ')" = 2
           for arch in arm64 x86_64; do
             lipo -thin "$arch" dist/libedax.universal.dylib -output "$RUNNER_TEMP/libedax-$arch.dylib"
