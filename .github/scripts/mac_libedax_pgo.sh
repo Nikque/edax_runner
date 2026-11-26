@@ -26,10 +26,11 @@ run() {
 }
 build_lib() {
     local output=$1 flags=$2
-    local options=(ARCH="$target" COMP=clang OS=osx CC="clang -arch $abi $flags")
-    # Apple clang on Intel emits a duplicate bit_count when profile use and LTO are combined.
-    if [[ "$abi" = x86_64 && "$output" = final-check ]]; then options+=(LTOFLAG=); fi
-    run "$output-build.log" make -C edax/src -B libbuild "${options[@]}"
+    local bit_count=
+    # In Intel profile-use builds, the table helper can become out-of-line and clash with
+    # the public FFI alias. Use Clang's generic popcount expansion without requiring POPCNT.
+    if [[ "$abi" = x86_64 ]]; then bit_count='-DPOPCOUNT -mno-popcnt'; fi
+    run "$output-build.log" make -C edax/src -B libbuild ARCH="$target" COMP=clang OS=osx CC="clang -arch $abi $bit_count $flags"
     cp "edax/bin/libedax-$target.dylib" "$tmp/$output/libedax.universal.dylib"
     test "$(lipo -archs "$tmp/$output/libedax.universal.dylib")" = "$abi"
 }
