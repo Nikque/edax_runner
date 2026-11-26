@@ -1,55 +1,77 @@
----
-name: Upload Artifacts
-
+name: macOS libedax PGO candidate
 on:
-  pull_request:
-  push:
-    branches:
-      - nikque-fixes
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  upload_artifacts:
-    runs-on: ${{ matrix.runner_machine }}
-    timeout-minutes: 10
+  slice:
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        include: # See: https://docs.github.com/ja/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#using-environment-variables-in-a-matrix
-          - os: ubuntu-latest
-            runner_machine: ubuntu-latest
-            edax_runner_bin_name: edax_runner
-            libedax_shared_library_pattern: "libedax*.so"
-          - os: windows-latest
-            runner_machine: windows-latest
-            edax_runner_bin_name: edax_runner.exe
-            libedax_shared_library_pattern: "libedax-x64*.dll"
-          - os: macos-latest # apple silicon
-            # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
-            runner_machine: macos-15 # (macos-latest kept the jobs waiting; the ZIP name keeps "macos-latest")
-            edax_runner_bin_name: edax_runner
-            libedax_shared_library_pattern: libedax.universal.dylib
-
+        include:
+          - { arch: arm64, target: arm64, runner: macos-15 }
+          - { arch: x86_64, target: x64-modern, runner: macos-15-intel }
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
-      - uses: dart-lang/setup-dart@v1.8.1
-      - name: install dependencies
-        run: dart pub get
-
-      - name: build edax_runner
-        shell: bash
-        run: ./scripts/build_edax_runner.sh ${{ matrix.edax_runner_bin_name }} "${{ matrix.libedax_shared_library_pattern }}"
-
-      - name: output build info
-        shell: bash
-        run: .github/scripts/output_build_info.sh build
-
-      # See: https://github.com/actions/upload-artifact/issues/38
-      # Workaround: https://github.com/actions/upload-artifact#maintaining-file-permissions-and-case-sensitive-files
-      - name: tar files
-        run: tar -cvf ${{ runner.os }}.tar build
-
-      - uses: actions/upload-artifact@v7
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          name: edax_runner-artifacts ${{ matrix.os }}
-          path: build
+          repository: Nikque/edax-reversi-AVX
+          ref: 4d16210cc91bb99fddaa372dceef8e2ca8990bfc
+          path: edax
+          sparse-checkout: |
+            /src/
+            /include/
+            /tests/libedax_test.c
+            /tests/check-build-paths.py
+            /bin/data/eval.dat
+          sparse-checkout-cone-mode: false
+      - name: Train and test a native macOS library
+        env:
+          ABI: ${{ matrix.arch }}
+          TARGET: ${{ matrix.target }}
+        run: |
+          bash .github/scripts/mac_libedax_pgo.sh "$ABI" "$TARGET"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: libedax-pgo-${{ matrix.arch }}
+          path: dist/
+          if-no-files-found: error
+
+  universal:
+    needs: slice
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: libedax-pgo-*
+          path: slices
+      - name: Join and verify both library slices
+        run: |
+          mkdir -p dist dist/evidence
+          ARM=slices/libedax-pgo-arm64
+          INTEL=slices/libedax-pgo-x86_64
+          for arch in arm64 x86_64; do
+            input="slices/libedax-pgo-$arch"
+            (cd "$input" && shasum -a 256 -c SHA256SUMS)
+            cp -R "$input/evidence" "dist/evidence/$arch"
+          done
+          lipo -create "$ARM/libedax.universal.dylib" "$INTEL/libedax.universal.dylib" -output dist/libedax.universal.dylib
+          lipo -verify_arch arm64 x86_64 dist/libedax.universal.dylib
+          test "$(lipo -archs dist/libedax.universal.dylib | wc -w | tr -d ' ')" = 2
+          for arch in arm64 x86_64; do
+            lipo -thin "$arch" dist/libedax.universal.dylib -output "$RUNNER_TEMP/libedax-$arch.dylib"
+            cmp "$RUNNER_TEMP/libedax-$arch.dylib" "slices/libedax-pgo-$arch/libedax.universal.dylib"
+          done
+          lipo -info dist/libedax.universal.dylib | tee dist/evidence/lipo.txt
+          otool -arch all -D dist/libedax.universal.dylib | tee dist/evidence/install-names.txt
+          (cd dist && shasum -a 256 libedax.universal.dylib | tee SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: libedax-pgo-universal
+          path: dist/
+          if-no-files-found: error
