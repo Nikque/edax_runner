@@ -206,6 +206,7 @@ libedax は、CPU の世代ごとにビルドしてあります。Windows と Li
 
 | edax_runner | Edax | |
 | :-- | :-- | :-- |
+| [5.3.0+nikque.21](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.21) | [4.5.5 nikque.34](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.34) | PGO でビルドした libedax に更新。定石の修復・保存と並列探索の停止処理を修正。 |
 | [5.3.0+nikque.20](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.20) | [4.5.5 nikque.33](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.33) | 手を読む順番を変えた libedax の更新、`config.ini` を nikque.33 と同じに |
 | [5.3.0+nikque.19](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.19) | [4.5.5 nikque.32](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.32) | 終盤の完全読みを速くした libedax の更新 |
 | [5.3.0+nikque.18](https://github.com/Nikque/edax_runner/releases/tag/v5.3.0-nikque.18) | [4.5.5 nikque.31](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.31) | Windows・Linux・macOS 用の libedax を更新 |

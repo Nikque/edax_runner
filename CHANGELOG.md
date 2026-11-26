@@ -4,6 +4,29 @@
 
 Versions of this fork. The history of the original edax_runner (5.3.0 and earlier) follows below. The tests and measurements are in [docs/validation/changelog.en.md](docs/validation/changelog.en.md).
 
+## 5.3.0+nikque.21
+
+This release bundles libedax from [Edax 4.5.5 nikque.34](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.34). The tag is `v5.3.0-nikque.21`.
+
+**Changes**
+
+- Windows and Linux include profile-guided builds for baseline x86-64, v3 and v4. The universal macOS library contains separate profile-guided builds for Apple silicon and Intel.
+
+**Fixes**
+
+- If `fix` runs out of space while normalizing a book, it still checks symmetric positions and removes links whose destination is missing.
+- libedax preserves a stop request received just before a parallel search starts. It accepts a book move only when it finds a legal move. (Edax release notes: [nikque.34](https://github.com/Nikque/edax-reversi-AVX/blob/d539716eb3f5aa44afe7eca20606e0e03b3b3c0c/RELEASE-NOTES.md#v455-nikque34))
+
+**Compatibility**
+
+- Existing `learning_list.txt`, `config.ini`, `eval.dat` and books remain usable. The fixes can change the contents of a repaired or newly learned book in affected positions.
+
+**Not checked**. Speed and memory use compared with the previous release, and learning with a large production book.
+
+[Tests and measurements](docs/validation/changelog.en.md#530nikque21)
+
+---
+
 ## 5.3.0+nikque.20
 
 This release bundles libedax from [Edax 4.5.5 nikque.33](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.33). The tag is `v5.3.0-nikque.20`.

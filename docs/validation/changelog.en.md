@@ -4,6 +4,15 @@
 
 The tests and measurements done for the versions of this fork, moved unchanged from [CHANGELOG.md](../../CHANGELOG.md). What changed in each version is in [CHANGELOG.md](../../CHANGELOG.md).
 
+## 5.3.0+nikque.21
+
+- The engine source is [Edax v4.5.5-nikque.34](https://github.com/Nikque/edax-reversi-AVX/tree/4d16210cc91bb99fddaa372dceef8e2ca8990bfc). Its public API header matches the previous version. The evaluation weights and the active entries in the bundled `config.ini` were also checked.
+- The three Windows DLLs match the replacements in the [official PGO release ZIP](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.34) byte for byte. All 38 Dart tests passed. With each of the baseline, v3 and v4 DLLs, the runner learned two synthetic games, saved the book and read it back after a restart.
+- Each Linux shared library was instrumented and trained on self-play and 19 endgame positions, then linked using the collected profile. All three passed 260 API checks each and exported the same symbols as their ordinary builds. The highest glibc symbol version required by these libraries is 2.34. [Linux build and tests](https://github.com/Nikque/edax_runner/actions/runs/45747705280)
+- The Apple silicon and Intel shared libraries were profiled and built on native macOS runners. Each passed 260 API checks. Both slices extracted from the universal library match the tested binaries byte for byte. [Build and tests of the bundled slices](https://github.com/Nikque/edax_runner/actions/runs/45748617123)
+
+---
+
 ## 5.3.0+nikque.20
 
 - All three Windows libraries, all three Linux libraries, and the macOS library match the published nikque.33 ZIP. The evaluation data is unchanged.

@@ -4,6 +4,15 @@
 
 この fork の各版で行ったテストと実測の記録です。[CHANGELOG.ja.md](../../CHANGELOG.ja.md) から、そのまま移しました。各版で何が変わったかは [CHANGELOG.ja.md](../../CHANGELOG.ja.md) にあります。
 
+## 5.3.0+nikque.21
+
+- エンジンのソースは [Edax v4.5.5-nikque.34](https://github.com/Nikque/edax-reversi-AVX/tree/4d16210cc91bb99fddaa372dceef8e2ca8990bfc) です。前版と公開 API ヘッダーが一致します。評価ファイルと、runner が配る `config.ini` の有効な設定行も照合しました。
+- Windows の3本は PGO 版に差し替えた [公式配布 ZIP](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.34) の DLL とバイト単位で一致します。Dart のテスト38件が成功しました。標準、v3、v4 の各 DLL を runner から読み込み、合成棋譜2局の学習、book の保存、再起動後の読み込みを確認しました。
+- Linux では各共有ライブラリを計測対象にして自己対局と終盤19局面を実行し、収集したプロファイルで最終リンクしました。3本とも API テスト260件に合格し、通常ビルドとエクスポートするシンボルが一致しました。ライブラリが要求する glibc シンボルの最高バージョンは 2.34 です。[Linux のビルドとテスト](https://github.com/Nikque/edax_runner/actions/runs/45747705280)
+- macOS の Apple silicon と Intel では、それぞれのネイティブランナー上で共有ライブラリを計測して最終ビルドしました。各版の API テスト260件が成功しました。結合したユニバーサルライブラリから取り出した2スライスは、テストした実体とバイト単位で一致します。[同梱スライスのビルドとテスト](https://github.com/Nikque/edax_runner/actions/runs/45748617123)
+
+---
+
 ## 5.3.0+nikque.20
 
 - Windows の3本、Linux の3本、macOS の1本が、公開された nikque.33 の ZIP に含まれる libedax と一致しました。評価ファイルは変わっていません。

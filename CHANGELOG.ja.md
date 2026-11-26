@@ -4,6 +4,29 @@
 
 この fork（[Nikque/edax_runner](https://github.com/Nikque/edax_runner)）の版だけを日本語で載せています。元の edax_runner の履歴（5.3.0 以前）は [CHANGELOG.md](CHANGELOG.md) にあります。テストと実測の記録は [docs/validation/changelog.ja.md](docs/validation/changelog.ja.md) にあります。
 
+## 5.3.0+nikque.21
+
+同梱の libedax を [Edax 4.5.5 nikque.34](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.34) に更新しました。タグは `v5.3.0-nikque.21` です。
+
+**変更**
+
+- Windows と Linux の標準版・v3・v4、macOS の Apple silicon 版と Intel 版で、各対象のプロファイルを使ってビルドしたライブラリを同梱します。macOS の2種類は1本のユニバーサルライブラリに収録しました。
+
+**不具合の修正**
+
+- `fix` で定石の一意化に必要な領域を確保できなかった場合も、対称な局面を確認し、到達先が存在しないリンクの削除を続けます。
+- libedax は並列探索の開始直前に届いた停止要求を保持します。定石手は合法な手を選べた場合だけ採用します。（Edax の修正一覧：[nikque.34](https://github.com/Nikque/edax-reversi-AVX/blob/d539716eb3f5aa44afe7eca20606e0e03b3b3c0c/RELEASE-NOTES.ja.md#v455-nikque34)）
+
+**互換性**
+
+- 既存の `learning_list.txt`、`config.ini`、`eval.dat`、book を引き続き使えます。修正対象の局面では、修復・学習後の book の内容が変わることがあります。
+
+**未確認**。前版との速度とメモリ使用量の比較、大規模な運用中の book での学習。
+
+[検証記録](docs/validation/changelog.ja.md#530nikque21)
+
+---
+
 ## 5.3.0+nikque.20
 
 同梱の libedax を [Edax 4.5.5 nikque.33](https://github.com/Nikque/edax-reversi-AVX/releases/tag/v4.5.5-nikque.33) に更新しました。タグは `v5.3.0-nikque.20` です。
