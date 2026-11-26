@@ -7,9 +7,15 @@ on:
     branches:
       - nikque-fixes
   workflow_dispatch:
+    inputs:
+      linux_libedax_pgo:
+        description: Build and verify the three Linux libedax PGO libraries
+        type: boolean
+        default: false
 
 jobs:
   upload_artifacts:
+    if: inputs.linux_libedax_pgo != true
     runs-on: ${{ matrix.runner_machine }}
     timeout-minutes: 10
     strategy:
@@ -53,3 +59,22 @@ jobs:
         with:
           name: edax_runner-artifacts ${{ matrix.os }}
           path: build
+
+  linux_libedax_pgo:
+    if: inputs.linux_libedax_pgo == true
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: Nikque/edax-reversi-AVX
+          ref: 4d16210cc91bb99fddaa372dceef8e2ca8990bfc
+          path: engine
+      - name: Train each shared library through libedax
+        run: bash .github/scripts/build_linux_libedax_pgo.sh engine linux-pgo
+      - uses: actions/upload-artifact@v4
+        with:
+          name: runner-linux-libedax-pgo
+          path: linux-pgo/
+          if-no-files-found: error
