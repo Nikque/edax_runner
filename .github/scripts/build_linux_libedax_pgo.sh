@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+train_source="$(cd "$(dirname "$0")" && pwd)/train_linux_libedax_pgo.c"
 source_root=$(cd "$1" && pwd)
 out=$2
 mkdir -p "$out"
@@ -35,6 +36,7 @@ run_logged() {
 }
 
 for arch in x86-64 x86-64-v3 x86-64-v4; do
+    echo "Processing $arch"
     engine=libedax-$arch.so
     suffix=${arch#x86-64}
     packaged=libedax$suffix.so
@@ -51,13 +53,14 @@ for arch in x86-64 x86-64-v3 x86-64-v4; do
     printf '%s  %s\n' "$instrumented" "$engine" > "$evidence/instrumented.sha256"
 
     gcc -O1 -D_GNU_SOURCE "$stage/tests/libedax_test.c" -L"$stage/bin" "-l:$engine" -Wl,-rpath,'$ORIGIN' -ldl -o "$work/train-$arch/api"
+    gcc -O1 -I"$stage/src" "$train_source" -L"$stage/bin" "-l:$engine" -Wl,-rpath,'$ORIGIN' -o "$work/train-$arch/train"
     cp "$stage/bin/$engine" "$work/train-$arch/"
     (
         cd "$work/train-$arch"
         run_logged "$evidence/training-api.txt" env LD_LIBRARY_PATH="$PWD" ./api "./$engine"
         grep -Eq '^[1-9][0-9]* checks, 0 failures$' "$evidence/training-api.txt"
-        run_logged "$evidence/training-search.txt" env LD_LIBRARY_PATH="$PWD" ./api "./$engine" bench 19 1
-        grep -Eq '^bench: 19 positions, [1-9][0-9]* nodes,' "$evidence/training-search.txt"
+        run_logged "$evidence/training-search.txt" env LD_LIBRARY_PATH="$PWD" ./train "$stage/problem/fforum-1-19.obf"
+        grep -Fxq 'FFI endgames: 19 exact scores and best moves' "$evidence/training-search.txt"
     )
 
     # Both stages pass the same output path to GCC, so it finds the GCDA for this shared library.
@@ -80,14 +83,15 @@ for arch in x86-64 x86-64-v3 x86-64-v4; do
     fi
 
     gcc -O1 -D_GNU_SOURCE "$stage/tests/libedax_test.c" -L"$stage/bin" "-l:$engine" -Wl,-rpath,'$ORIGIN' -ldl -o "$work/test-$arch/api"
+    cp "$work/train-$arch/train" "$work/test-$arch/"
     cp "$stage/bin/$engine" "$work/test-$arch/"
     (
         cd "$work/test-$arch"
         run_logged "$evidence/final-api.txt" env LD_LIBRARY_PATH="$PWD" ./api "./$engine"
         grep -Eq '^[1-9][0-9]* checks, 0 failures$' "$evidence/final-api.txt"
-        run_logged "$evidence/final-search.txt" env LD_LIBRARY_PATH="$PWD" ./api "./$engine" bench 19 1
-        grep -Eq '^bench: 19 positions, [1-9][0-9]* nodes,' "$evidence/final-search.txt"
-        diff -u <(grep '^bench:' "$evidence/training-search.txt" | cut -d, -f1-2)             <(grep '^bench:' "$evidence/final-search.txt" | cut -d, -f1-2)
+        run_logged "$evidence/final-search.txt" env LD_LIBRARY_PATH="$PWD" ./train "$stage/problem/fforum-1-19.obf"
+        grep -Fxq 'FFI endgames: 19 exact scores and best moves' "$evidence/final-search.txt"
+        grep -Fxq 'FFI self-play: 2 complete games' "$evidence/final-search.txt"
     )
 
     cp "$stage/bin/$engine" "$out/$packaged"
